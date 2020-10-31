@@ -1,5 +1,14 @@
 <?php
 header('Content-type: text/html; charset=utf-8');
+
+$headerCookie = $_COOKIE['header'] ?? 1;
+if ($headerCookie == 0) {
+    $header = 'class="none"';
+    $button = 'class="hidden"';
+} else {
+    $header = 'class="flex"';
+    $button = 'class="visible"';
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -12,8 +21,27 @@ header('Content-type: text/html; charset=utf-8');
 </head>
 
 <body>
-    <header>
-        <nav></nav>
+    <nav>
+        <div id="menu" class="flex" style="justify-content:space-between;">
+            <div class="flex">
+                <?php echo '<div style="padding:1em">Hello <b>' . $user->name . ($user->admin ? '</b> (admin)</div><a href="manage.php">
+                        <div class="menuElement">Manage Page</div>
+                    </a>' : '</b></div>');  ?>
+            </div>
+            <div id="menuItems" class="flex">
+                <a href="?logout">
+                    <div class="menuElement">MPs</div>
+                </a>
+                <a href="?logout">
+                    <div class="menuElement">Parties</div>
+                </a>
+                <a href="?logout">
+                    <div class="menuElement">Logout</div>
+                </a>
+            </div>
+        </div>
+    </nav>
+    <header id="header" <?php echo $header; ?>>
         <div class="header">
             <div class="headerText">
                 <h1>Huddland Parliament</h1>
@@ -21,3 +49,4 @@ header('Content-type: text/html; charset=utf-8');
             </div>
         </div>
     </header>
+    <div id="xButton" <?php echo  $button; ?>></div>

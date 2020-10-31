@@ -1,7 +1,10 @@
 <main>
-    <a href="?logout">Logout</a>
-    <?php
-    echo 'Hello <b>' . $user->name . ($user->admin ? '</b> (admin)' : '</b>') . '!<br><br>';
-    $mp->displayMpList();
-    ?>
+    <div class="wrapper">
+        <div id="searchBar">
+            <input type="text" name="name" placeholder="MP name">
+            <input type="text" name="party" placeholder="Party name">
+            <input type="text" name="cons" placeholder="Constiutenasdas name">
+        </div>
+        <?php $mp->displayMpList(); ?>
+    </div>
 </main>

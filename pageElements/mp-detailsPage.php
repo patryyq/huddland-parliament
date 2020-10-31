@@ -1,4 +1,9 @@
 <?php
+// This file is used to render HTML content for "mp-details.php" page
+//
+//
+//
+// variables to hold all MP details
 $mpDetails = $mp->getMpDetails()[0];
 $firstName = $mpDetails['firstname'];
 $lastName = $mpDetails['lastname'];
@@ -8,11 +13,10 @@ $dateOfFoundation = date_format(date_create($mpDetails['date_of_foundation']), '
 $colour =  $mpDetails['principal_colour'];
 $region =  $mpDetails['region'];
 $electorate =  $mpDetails['electorate'];
-$age = $mp->getMpAge($dateOfBirth);
+$age = $mp->getAge($dateOfBirth);
 $formatedDoB = date_format(date_create($dateOfBirth), 'd/m/Y');
 ?>
 <main>
-    <a href="?logout">Logout</a>
     <div id="mpDetails">
         <div class="mpName">
             <?php

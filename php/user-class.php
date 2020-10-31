@@ -12,18 +12,18 @@ class user
 
     function __construct()
     {
-        isset($_GET['logout']) ? $this->logOut() : FALSE;
-        $this->password = $_POST['password'] ?? FALSE;
-        $this->email = $_POST['email'] ?? FALSE;
-        $this->name = $_SESSION['name'] ?? FALSE;
-        $this->admin = $_SESSION['admin'] ?? FALSE;
+        isset($_GET['logout']) ? $this->logOut() : false;
+        $this->password = $_POST['password'] ?? false;
+        $this->email = $_POST['email'] ?? false;
+        $this->name = $_SESSION['name'] ?? false;
+        $this->admin = $_SESSION['admin'] ?? false;
         $this->db = new db();
     }
 
     // check if user is logged in
     public function isLoggedIn()
     {
-        return $_SESSION['isLoggedIn'] ?? FALSE;
+        return $_SESSION['isLoggedIn'] ?? false;
     }
 
     // log in
@@ -34,13 +34,13 @@ class user
             // check if passwords match
             if ($this->verifyHash($this->password, $result[0]['password'])) {
                 // set isLoggedIn session variable to true, also set admin variable based on 'role' from db
-                $_SESSION['isLoggedIn'] = TRUE;
+                $_SESSION['isLoggedIn'] = true;
                 $_SESSION['name'] = $result[0]['name'];
-                ($result[0]['role'] == '2') ? $_SESSION['admin'] = TRUE : $_SESSION['admin'] = FALSE;
-                return TRUE;
+                ($result[0]['role'] == '2') ? $_SESSION['admin'] = true : $_SESSION['admin'] = false;
+                return true;
             } else {
                 $this->error = "Email or password doesn't match.<br>";
-                return FALSE;
+                return false;
             }
         }
         $this->error = "Email or password doesn't match.<br>";
@@ -69,14 +69,14 @@ class user
     // verify if provided, hashed password matches hash from DB
     private function verifyHash($password, $hashFromDb)
     {
-        return password_verify($password, $hashFromDb) ? TRUE : FALSE;
+        return password_verify($password, $hashFromDb) ? true : false;
     }
 
     // get the details needed to log in based on provided email; return false if no email marched
     private function getDetailsToLogIn()
     {
         $query = "SELECT name, password, email, id, role FROM users WHERE email = ?";
-        $result = $this->db->dbQuery($query, array($this->email));
-        return $result ? $result : FALSE;
+        $result = $this->db->selectQuery($query, array($this->email));
+        return $result ? $result : false;
     }
 }

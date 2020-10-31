@@ -25,7 +25,7 @@ class db
     // simplifie/speed up databse queries
     //
     // if no $parameters provided, execute without params
-    public function dbQuery($query, $parameters = false)
+    public function selectQuery($query, $parameters = false)
     {
         try {
             $query = $this->conn->prepare($query);
@@ -33,6 +33,20 @@ class db
                 $query->execute($parameters) :
                 $query->execute();
             return $query->fetchAll();
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+            return false;
+        }
+    }
+
+    public function updateDeleteInsertQuery($query, $parameters = false)
+    {
+        try {
+            $query = $this->conn->prepare($query);
+            ($parameters) ?
+                $query->execute($parameters) :
+                $query->execute();
+            return $query;
         } catch (PDOException $e) {
             echo $e->getMessage();
             return false;
