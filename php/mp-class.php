@@ -1,5 +1,6 @@
 <?php
 
+
 class mp
 {
     // private $db;
@@ -7,14 +8,17 @@ class mp
     // private $firstName;
     // private $lastName;
     // private $dateOfBirth;
-    // private $partyID;
+    public $error = array();
+    // array with all needed POST data keys to AMEND MP DATA
+    private $amendMPkeys = ['mpFirstname', 'mpLastname', 'mpDoB', 'mpConstituencyID', 'mpInterests', 'mpPartyID'];
+    // array with all needed POST data keys to AMEND PARTY DATA
+    private $amendPARTYkeys = ['mpFirstname', 'mpLastname', 'mpDoB', 'mpConstituencyID', 'mpInterests', 'mpPartyID'];
 
     function __construct()
     {
+        $this->mpID = isset($_GET['mpID']) && is_numeric($_GET['mpID']) ? $_GET['mpID'] : ($_SESSION['mpID'] ?? false);
+        $this->partyID = isset($_GET['partyID']) && is_numeric($_GET['partyID']) ? $_GET['partyID'] : ($_SESSION['partyID'] ?? false);
         $this->db = new db();
-        $this->mpID = isset($_GET['mpID']) && ctype_digit($_GET['mpID']) ? $_GET['mpID'] : ($_SESSION['mpID'] ?? false);
-        $this->partyID = isset($_GET['partyID']) && ctype_digit($_GET['partyID']) ? $_GET['partyID'] : ($_SESSION['partyID'] ?? false);
-        $this->error = array();
     }
 
     private function getAllMp()
@@ -50,11 +54,11 @@ class mp
             "SELECT members.id, members.firstname, members.party_id, members.lastname, members.date_of_birth, parties.name, parties.date_of_foundation, parties.principal_colour, constituencies.region, constituencies.electorate, constituencies.id AS constiID,
             GROUP_CONCAT(interests.name SEPARATOR ', ') AS interests,
             GROUP_CONCAT(interests.id SEPARATOR ',') AS interestsID
-            FROM members 
-            INNER JOIN parties ON parties.id = members.party_id 
-            INNER JOIN constituencies ON constituencies.id = members.constituency_id 
-            INNER JOIN interest_member ON interest_member.member_id = members.id
-            INNER JOIN interests ON interests.id = interest_member.interest_id
+            FROM members
+            LEFT JOIN parties ON parties.id = members.party_id
+            LEFT JOIN constituencies ON constituencies.id = members.constituency_id 
+            LEFT JOIN interest_member ON interest_member.member_id = members.id
+            LEFT JOIN interests ON interests.id = interest_member.interest_id
             WHERE members.id = ?";
         $param = array($this->mpID);
         $mp = $this->db->selectQuery($query, $param);
@@ -66,16 +70,12 @@ class mp
             $_SESSION['mpConstituencyID'] = $mp[0]['constiID'];
             $_SESSION['mpInterestIDs'] = explode(',', $mp[0]['interestsID']);
             $_SESSION['mpPartyID'] = $mp[0]['party_id'];
-
-            // if (!isset($_GET['amendPARTY']) && !isset($_GET['removePARTY'])) {
-            //     $_SESSION['partyID'] = $mp[0]['party_id'];
-            //     $this->partyID = $mp[0]['party_id'];
-            // }
             $this->mpPartyID = $mp[0]['party_id'];
             $this->constituencyID = $mp[0]['constiID'];
             $this->interestsID = explode(',', $mp[0]['interestsID']);
             return $mp;
         } else {
+            unset($_SESSION['mpID']);
             return false;
         }
     }
@@ -120,7 +120,7 @@ class mp
     {
         $amendOrRemove = $amendOrRemove == 'amend' ? 'mpList' : 'mpRemoveList';
         if ($mps = $this->getAllMp()) {
-            $selectStart = '<select style="font-weight:bold;border:4px solid #03339d" id="' . $amendOrRemove . '" name="' . $amendOrRemove . '"><option value=""></option>';
+            $selectStart = '<select style="font-weight:bold;border:4px solid #03339d" id="' . $amendOrRemove . '" name="' . $amendOrRemove . '"><option value="0"></option>';
             $selectEnd = '</select>';
             $options = '';
             foreach ($mps as $mp) {
@@ -141,13 +141,16 @@ class mp
         if ($parties = $this->getAllParties()) {
             if ($inMpOrPartySection == 'amendParty') {
                 $partyId = $this->partyID;
-                $selectStart = '<select style="font-weight:bold;border:4px solid #03339d" id="partyAmendList" name="partyAmendList"><option value=""></option>';
+                $selectStart = '<select style="font-weight:bold;border:4px solid #03339d" id="partyAmendList" name="partyAmendList"><option value="0"></option>';
             } else if ($inMpOrPartySection == 'removeParty') {
                 $partyId = $this->partyID;
-                $selectStart = '<select style="font-weight:bold;border:4px solid #03339d" id="partyRemoveList" name="partyRemoveList"><option value=""></option>';
-            } else if ($inMpOrPartySection == 'mp') {
+                $selectStart = '<select style="font-weight:bold;border:4px solid #03339d" id="partyRemoveList" name="partyRemoveList"><option value="0"></option>';
+            } else if ($inMpOrPartySection == 'amendMp') {
                 $partyId = $this->mpPartyID;
-                $selectStart = '<select id="party" name="party">';
+                $selectStart = '<select id="party" name="party"><option value="0"></option>';
+            } else if ($inMpOrPartySection == 'addMp') {
+                $partyId = 0;
+                $selectStart = '<select id="party" name="party"><option value="0"></option>';
             }
             $selectEnd = '</select>';
             $options = '';
@@ -174,11 +177,16 @@ class mp
         $party = $this->db->selectQuery($query, $param);
         if (count($party) > 0) {
             $_SESSION['partyID'] = $party[0]['id'];
+            $_SESSION['partyName'] = $party[0]['name'];
+            $_SESSION['partyDoF'] = $party[0]['date_of_foundation'];
+            $_SESSION['partyPrincipalColour'] = $party[0]['principal_colour'];
+
             $this->partyID = $party[0]['id'];
             $this->dateOfFoundation = $party[0]['date_of_foundation'];
             $this->principalColour = $party[0]['principal_colour'];
             return $party;
         } else {
+            unset($_SESSION['partyID']);
             return false;
         }
     }
@@ -187,9 +195,12 @@ class mp
     {
         if ($constituencies = $this->getAllConstituencies()) {
             if ($inMpOrConstituencySection == 'constituency') {
-                $selectStart = '<select style="font-weight:bold;border:4px solid #03339d" id="constituency" name="constituency"><option value=""></option>';
-            } else if ($inMpOrConstituencySection == 'mp') {
+                $selectStart = '<select style="font-weight:bold;border:4px solid #03339d" id="constituency" name="constituency"><option value="0"></option>';
+            } else if ($inMpOrConstituencySection == 'amendMp') {
                 $selectStart = '<select id="constituency" name="constituency">';
+            } else if ($inMpOrConstituencySection == 'addMp') {
+                $this->constituencyID = 0;
+                $selectStart = '<select id="constituency" name="constituency"><option value="0"></option>';
             }
             $selectEnd = '</select>';
             $options = '';
@@ -205,13 +216,13 @@ class mp
             return false;
         }
     }
-
-    public function displayInterestsList()
+    // if amend leave parameter blank, if adding, set to false
+    public function displayInterestsList($amendAdd = true)
     {
         $interests = $this->getAllInterests();
         $input = '';
         foreach ($interests as $interest) {
-            if (in_array($interest['id'], $this->interestsID)) {
+            if (in_array($interest['id'], ($amendAdd ? $this->interestsID : array()))) {
                 $input .= '<div class="interests"><input type="checkbox" checked name="interests[]" value="' . $interest['id'] . '">' . $interest['name'] . '</div>';
             } else {
                 $input .= '<div class="interests"><input type="checkbox" name="interests[]" value="' . $interest['id'] . '">' . $interest['name'] . '</div>';
@@ -220,29 +231,87 @@ class mp
         return $input;
     }
 
-    private function validateEmail($str)
+    // private function validateEmail($postEmail)
+    // {
+    //     return (!preg_match("/^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,6}$/ix", $postEmail)) ? false : true;
+    // }
+
+    private function getPostData()
     {
-        return (!preg_match("/^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,6}$/ix", $str)) ? FALSE : TRUE;
+        $_POST['firstname'] ? $postDATA['mpFirstname'] = $_POST['firstname'] : false;
+        $_POST['lastname'] ? $postDATA['mpLastname'] = $_POST['lastname'] : false;
+        $_POST['dateOfBirth'] ? $postDATA['mpDoB'] = $_POST['dateOfBirth'] : false;
+        $_POST['constituency'] ? $postDATA['mpConstituencyID'] = $_POST['constituency'] : false;
+        isset($_POST['interests']) ? $postDATA['mpInterests'] = $_POST['interests'] : false;
+        $_POST['party'] ? $postDATA['mpPartyID'] = $_POST['party'] : false;
+        return $postDATA;
     }
 
-    private function validatePOST($actionType)
+    private function getSessionData()
     {
-        $firstnamePOST = $_POST['firstname'];
-        $_POST['lastname'];
-        $_POST['dateOfBirth'];
-        $_POST['party'];
-        $_POST['constituency'];
-        echo '<pre>';
-        echo var_dump($_POST['interests']);
-        echo '</pre>';
+        $_SESSION['mpFirstName'] ? $sessionDATA['mpFirstname'] = $_SESSION['mpFirstName'] : false;
+        $_SESSION['mpLastName'] ? $sessionDATA['mpLastname'] = $_SESSION['mpLastName'] : false;
+        $_SESSION['mpDoB'] ? $sessionDATA['mpDoB'] = $_SESSION['mpDoB'] : false;
+        $_SESSION['mpConstituencyID'] ? $sessionDATA['mpConstituencyID'] = $_SESSION['mpConstituencyID'] : false;
+        $_SESSION['mpInterestIDs'] ? $sessionDATA['mpInterests'] = $_SESSION['mpInterestIDs'] : false;
+        $_SESSION['mpPartyID'] ? $sessionDATA['mpPartyID'] = $_SESSION['mpPartyID'] : false;
+        return $sessionDATA;
     }
+
+    // build query based on action type: 0 => amendMP, 1 => amendPARTY, 2 => amendCONST, 3 => amendINT
+    private function hasEnoughPostData($postDATA, $action)
+    {
+        $result = true;
+        $keysArray = ($action == 0 ? $this->amendMPkeys : ($action == 1 ? $this->amendPARTYkeys : array('asdasd')));
+        foreach ($keysArray as $key) {
+            if (!array_key_exists($key, $postDATA)) {
+                $result = false;
+            }
+        }
+        return $result;
+    }
+
+
     public function amendMP()
     {
+        $postDATA = $this->getPostData();
+        $checkPost = $this->hasEnoughPostData($postDATA, 0);
+        if ($checkPost) {
+            echo "post:<br><br><pre>";
+            echo var_dump($this->getPostData());
+            echo "</pre>";
+            echo "session:<br><br><pre>";
+            echo var_dump($this->getSessionData());
+            echo "</pre>";
+
+            $query = "DELETE interest_member FROM interest_member WHERE interest_member.member_id = ?";
+            $removeMPinterest = $this->db->updateDeleteInsertQuery($query, array($this->mpID));
+            if ($removeMPinterest) {
+                $query = "UPDATE members SET firstname = ?, lastname = ?, date_of_birth = ?, party_id = ?, constituency_id = ? WHERE id = ?";
+                $params = array($postDATA['mpFirstname'], $postDATA['mpLastname'], $postDATA['mpDoB'], $postDATA['mpPartyID'], $postDATA['mpConstituencyID'], $this->mpID);
+                $amendMP = $this->db->updateDeleteInsertQuery($query, $params);
+                if ($amendMP) {
+                    $result = true;
+                    foreach ($postDATA['mpInterests'] as $interest) {
+                        $query = "INSERT INTO interest_member (member_id, interest_id) VALUES (?, ?)";
+                        $insertMPinterests = $this->db->updateDeleteInsertQuery($query, array($this->mpID, $interest));
+                        if (!$insertMPinterests) {
+                            $result = false;
+                        }
+                    }
+                } else {
+                    return false;
+                }
+                return $result;
+            } else {
+                return false;
+            }
+        }
     }
 
     public function removeMP()
     {
-        // DELETE MP alongside with interests from interest_member
+        // DELETE MP (members table) alongside with interests (interest_member table)
         $query = "DELETE interest_member, members FROM interest_member INNER JOIN members ON members.id = interest_member.member_id WHERE interest_member.member_id = ?";
         $removeMP = $this->db->updateDeleteInsertQuery($query, array($this->mpID));
         if ($removeMP) {

@@ -33,8 +33,8 @@ if ($mpDetails['firstname'] != NULL) {
             echo '<div style="width:48%"><label for="dateOfBirth">Date of birth:</label><br>
                   <input type="date" name="dateOfBirth" value="' . $dateOfBirth . '"></div>';
             echo '<div style="width:48%"><label for="party">Party:</label><br>'
-                . $mp->displayPartiesList('mp') . '</div>';
-            echo '<div style="width:48%"><label for="constituency">Constituency:</label><br>' . $mp->displayConstituenciesList('mp') . '</div>';
+                . $mp->displayPartiesList('amendMp') . '</div>';
+            echo '<div style="width:48%"><label for="constituency">Constituency:</label><br>' . $mp->displayConstituenciesList('amendMp') . '</div>';
             echo '<div style="width:100%" class="flex"><p>Interests:</p>' . $mp->displayInterestsList() . '</div>';
             echo '<p>Do you want to amend <b>' . $firstName . ' ' . $lastName . '</b>?</p><div style="width:48%">
             <input type="submit" name="amendMpButton" value="Amend MP"></div></form>';
@@ -57,11 +57,27 @@ if ($mpDetails['firstname'] != NULL) {
     </div>
     <div id="addMp" class="none" style="justify-content:space-between">
         <p><b>Add</b> a new <b>MP</b>:</p>
-        <p>Do you want to <b>add</b> a <b>new MP</b>?</p>
-        <div style="width:48%">
-            <form method="POST" action="php/manageProcess.php" class="flexForm">
-                <input type="submit" name="addMpButton" value="Add MP">
-            </form>
-        </div>
+        <form method="POST" action="php/manageProcess.php" class="flexForm">
+            <div style="width:48%">
+                <label for="name">First name:</label><br>
+                <input type="text" name="firstname" value="">
+            </div>
+            <div style="width:48%">
+                <label for="name">Last name:</label><br>
+                <input type="text" name="lastname" value="">
+            </div>
+            <div style="width:48%">
+                <label for="dateOfBirth">Date of birth:</label><br>
+                <input type="date" name="dateOfBirth" value=""></div>
+            <div style="width:48%"><label for="party">Party:</label><br>
+                <?php echo $mp->displayPartiesList('addMp'); ?> </div>
+            <div style="width:48%"><label for="constituency">Constituency:</label><br>
+                <?php echo $mp->displayConstituenciesList('addMp'); ?></div>
+            <div style="width:100%" class="flex">
+                <p>Interests:</p><?php echo $mp->displayInterestsList(false); ?>
+            </div>
+            <p>Do you want to <b>add</b> a <b>new MP</b>?</p>
+            <div style="width:48%"> <input type="submit" name="addMpButton" value="Add MP"></div>
+        </form>
     </div>
 </div>
