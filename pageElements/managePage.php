@@ -2,37 +2,46 @@
 // This file is used to render HTML content for "manage.php" page
 //
 //
-//
+// could use '$_GET ?? false' synthax but in my case it returns false cause value is empty
+// isset() returns true even if the value is empty
+$mpGET = isset($_GET['mp']) ? true : false;
+$partyGET = isset($_GET['party']) ? true : false;
+$interestsGET = isset($_GET['interest']) ? true : false;
+$constituencyGET = isset($_GET['constituency']) ? true : false;
 
-// variables to hold all of selected PARTY details
 ?>
 <main>
     <div id="manage" class="wrapper">
-        <h1>Manage page content</h1>
+        <h1>Add content to the page</h1>
         <p style="padding: 0 1em; box-sizing:border-box;">
-            <b><?php echo $user->name; ?></b>, as a admin, you can <b>amend</b>, <b>remove</b> or <b>add</b> data to Huddland Parliament.</p>
-        <div class="tutaj message">
-            <!-- <p style="padding: 0 1em; box-sizing:border-box; color:red;">
-                <b><?php echo $user->name; ?></b>, as a admin, you can <b>amend</b>, <b>remove</b> or <b>add</b> data to Huddland Parliament.</p> -->
-        </div>
+            <b><?php echo $user->name; ?></b>, as a admin, you can <b>add</b> content to the Huddland Parliament website.</p>
+        <?php
+        $parliament->displayMessage();
+        $mpGET ? $parliament->displayError() : false;
+        ?>
         <div id="MPmanage" class="manage">
             <?php include('managePage-mp.php'); ?>
         </div>
+        <?php
+        $partyGET ? $parliament->displayError() : false;
+        ?>
         <div id="PARTYmanage" class="manage">
             <?php include('managePage-party.php'); ?>
         </div>
-        <div class="manage">
-            <div id="interests" class="manageTitle">Interests</div>
-            <div class="manageContent none">
-                <p>Here you can add, remove and amend interests.</p>
-            </div>
+        <?php
+        $interestsGET ? $parliament->displayError() : false;
+        ?>
+        <div id="INTERESTSmanage" class="manage">
+            <?php include('managePage-interests.php'); ?>
         </div>
-        <div class="manage">
-            <div id="constituencies" class="manageTitle">Constituencies</div>
-            <div class="manageContent none">
-                <p>Here you can add, remove and amend constituencies.</p>
-            </div>
+        <?php
+        $constituencyGET ? $parliament->displayError() : false;
+        ?>
+        <div id="CONSTITUENCYmanage" class="manage">
+            <?php include('managePage-constituency.php'); ?>
         </div>
     </div>
 </main>
 <script src="js/manage.js"></script>
+<?php
+$parliament->unsetSession();

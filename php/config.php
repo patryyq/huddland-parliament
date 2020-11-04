@@ -6,4 +6,5 @@ define('LOGINPAGE', '/huddland-parliament/login.php');
 
 include('user-class.php');
 include('db-class.php');
-include('mp-class.php');
+include('parliament-class.php');
+include('validate-class.php');

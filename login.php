@@ -2,7 +2,7 @@
 include('php/config.php');
 
 $user = new user();
-$mp = new mp();
+$parliament = new parliament();
 
 
 include('pageElements/loginPage.php');

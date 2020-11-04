@@ -76,7 +76,7 @@ class user
     private function getDetailsToLogIn()
     {
         $query = "SELECT name, password, email, id, role FROM users WHERE email = ?";
-        $result = $this->db->selectQuery($query, array($this->email));
+        $result = $this->db->selectQuery($query, [$this->email]);
         return $result ? $result : false;
     }
 }

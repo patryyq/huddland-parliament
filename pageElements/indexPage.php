@@ -5,6 +5,6 @@
             <input type="text" name="party" placeholder="Party name">
             <input type="text" name="cons" placeholder="Constiutenasdas name">
         </div>
-        <?php $mp->displayMpList(); ?>
+        <?php $parliament->displayMpList(); ?>
     </div>
 </main>

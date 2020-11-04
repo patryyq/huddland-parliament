@@ -24,17 +24,11 @@ if ($headerCookie == 0) {
     <nav>
         <div id="menu" class="flex" style="justify-content:space-between;">
             <div class="flex">
-                <?php echo '<div style="padding:1em">Hello <b>' . $user->name . ($user->admin ? '</b> (admin)</div><a href="manage.php">
-                        <div class="menuElement">Manage Page</div>
-                    </a>' : '</b></div>');  ?>
+                <?php echo '<div style="padding:1em">Hello <b>' . $user->name . ($user->admin ? '</b> (admin)</div>' : '</b></div>');  ?>
             </div>
             <div id="menuItems" class="flex">
-                <a href="?logout">
-                    <div class="menuElement">MPs</div>
-                </a>
-                <a href="?logout">
-                    <div class="menuElement">Parties</div>
-                </a>
+                <?php echo ($user->admin ? '<a href="manage.php"><div class="menuElement">Add content</div></a>' : FALSE);  ?>
+
                 <a href="?logout">
                     <div class="menuElement">Logout</div>
                 </a>

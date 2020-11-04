@@ -1,7 +1,7 @@
 <?php
 include('php/config.php');
 $user = new user();
-$mp = new mp();
+$parliament = new parliament();
 $user->isLoggedIn() ? true : header('Location: ' . LOGINPAGE);
 
 include('pageElements/header.php');

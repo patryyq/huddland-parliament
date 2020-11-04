@@ -4,7 +4,7 @@
 //
 //
 // variables to hold all MP details
-$mpDetails = $mp->getMpDetails()[0];
+$mpDetails = $parliament->getMpDetails()[0];
 $firstName = $mpDetails['firstname'];
 $lastName = $mpDetails['lastname'];
 $dateOfBirth = $mpDetails['date_of_birth'];
@@ -13,8 +13,9 @@ $dateOfFoundation = date_format(date_create($mpDetails['date_of_foundation']), '
 $colour =  $mpDetails['principal_colour'];
 $region =  $mpDetails['region'];
 $electorate =  $mpDetails['electorate'];
-$age = $mp->getAge($dateOfBirth);
+$age = $parliament->getAge($dateOfBirth);
 $formatedDoB = date_format(date_create($dateOfBirth), 'd/m/Y');
+$interests = $mpDetails['interests'];
 ?>
 <main>
     <div id="mpDetails">
@@ -33,6 +34,7 @@ $formatedDoB = date_format(date_create($dateOfBirth), 'd/m/Y');
             echo 'Principal colour: ' . $colour . '<br>';
             echo 'Region: ' .  $region . '<br>';
             echo 'Electorate: ' .  $electorate . '<br>';
+            echo 'Interests: ' .  $interests . '<br>';
             ?>
         </div>
 
