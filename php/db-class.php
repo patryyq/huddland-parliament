@@ -11,7 +11,7 @@ class db
 
     function __construct()
     {
-        // on object initialisation, connect to db
+        // establish DB connection
         try {
             $this->conn = new PDO("mysql:host=" . $this->dbHost . ";dbname=" . $this->dbName, $this->dbUser, $this->dbPass);
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -51,7 +51,11 @@ class db
         }
     }
 
-
+    // add MP function
+    //
+    // get and validate POST data
+    // all requirements are met => add to DB; else false;
+    // in the end redirect to manage page
     public function addMP()
     {
         $validate = new validate();
@@ -74,6 +78,11 @@ class db
         header('Location: manage.php?mp');
     }
 
+    // add party function
+    //
+    // get and validate POST data
+    // all requirements are met => add to DB; else false;
+    // in the end redirect to manage page
     public function addPARTY()
     {
         $validate = new validate();
@@ -89,6 +98,11 @@ class db
         header('Location: manage.php?party');
     }
 
+    // add interest function
+    //
+    // get and validate POST data
+    // all requirements are met => add to DB; else false;
+    // in the end redirect to manage page
     public function addINTEREST()
     {
         $validate = new validate();
@@ -103,6 +117,11 @@ class db
         header('Location: manage.php?interest');
     }
 
+    // add constituency function
+    //
+    // get and validate POST data
+    // all requirements are met => add to DB; else false;
+    // in the end redirect to manage page
     public function addCONSTITUENCY()
     {
         $validate = new validate();
@@ -117,25 +136,30 @@ class db
         header('Location: manage.php?constituency');
     }
 
-    // below number of functions to get all rows from certain category
+    // functions to get all rows from certain category
+    //
+    // all MPs
     public function getAllMp()
     {
         $query = "SELECT id, firstname, lastname FROM members";
         return $this->selectQuery($query);
     }
 
+    // all parties
     public function getAllParties()
     {
         $query = "SELECT id, name, date_of_foundation, principal_colour FROM parties";
         return $this->selectQuery($query);
     }
 
+    // all interests
     public function getAllInterests()
     {
         $query = "SELECT id, name FROM interests";
         return $this->selectQuery($query);
     }
 
+    // all constituencies
     public function getAllConstituencies()
     {
         $query = "SELECT id, region, electorate FROM constituencies";

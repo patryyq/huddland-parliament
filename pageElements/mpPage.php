@@ -1,5 +1,5 @@
 <?php
-// This file is used to render HTML content for "mp-details.php" page
+// This file is used to render HTML content for "mp.php" page
 //
 //
 //

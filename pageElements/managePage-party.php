@@ -19,7 +19,7 @@
                 <input id="principalColour" autocomplete="off" type="text" placeholder="Colour name" name="principalColour" value="<?php echo $_SESSION['principalColour'] ?? false; ?>" style="margin-bottom:0;">
                 <select id="colours" multiple style="display:none" size="10">
                     <?php
-                    $parliament->dropdownMenu(); ?>
+                    $parliament->coloursDropdown(); ?>
                 </select>
             </div>
             <p style="margin-top: 3em;">Do you want to add a new <b>party</b>?</p>

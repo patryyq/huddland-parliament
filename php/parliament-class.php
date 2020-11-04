@@ -1,13 +1,11 @@
 <?php
 
-
 class parliament
 {
     public $error = [];
 
     function __construct()
     {
-        // is_numeric($_GET['mpID']) === true; should be enough 
         $this->mpID = isset($_GET['mpID']) && is_numeric($_GET['mpID']) ? $_GET['mpID'] : false;
         // // is_numeric($_GET['partyID']) === true; should be enough 
         // $this->partyID = isset($_GET['partyID']) && is_numeric($_GET['partyID']) ? $_GET['partyID'] : false;
@@ -18,6 +16,7 @@ class parliament
     public function getMpDetails()
     {
         // used GROUP_CONCAT to gather all interests as single string
+        // rather than having duplicated results/rows with only different interest
         $query =
             "SELECT members.id, members.firstname, members.party_id, members.lastname, members.date_of_birth, parties.name, parties.date_of_foundation, parties.principal_colour, constituencies.region, constituencies.electorate, constituencies.id AS constiID,
             GROUP_CONCAT(interests.name SEPARATOR ', ') AS interests,
@@ -63,7 +62,7 @@ class parliament
     {
         if ($mps = $this->db->getAllMp()) {
             foreach ($mps as $mp) {
-                echo '<a href="mp-details.php?mpID=' . $mp['id'] . '">' . $mp['firstname'] . ' ' . $mp['lastname'] . '</a><br>';
+                echo '<a href="mp.php?mpID=' . $mp['id'] . '">' . $mp['firstname'] . ' ' . $mp['lastname'] . '</a><br>';
             }
         } else {
             return false;
@@ -125,6 +124,9 @@ class parliament
         return $input;
     }
 
+    // function called after ADD functions (MP/party/interest/constituency)
+    // to destroy $_SESSION values which are used to populate form data
+    // so, after a record is added to DB, the form is empty
     public function unsetSession()
     {
         unset($_SESSION['firstname']);
@@ -141,6 +143,11 @@ class parliament
         unset($_SESSION['constituencyRegion']);
     }
 
+    // display confirmation messages
+    // 0 => add MP
+    // 1 => add party
+    // 2 => add interest
+    // 3 => add constituency
     public function displayMessage()
     {
         if (isset($_SESSION['confirmationMessage'])) {
@@ -157,24 +164,33 @@ class parliament
         }
     }
 
+    // display error messages
     public function displayError()
     {
-        if (isset($_SESSION['validError'])) {
+        if (isset($_SESSION['errorMessage'])) {
             echo '<div id="errorMessage" class="none">';
-            foreach ($_SESSION['validError'] as $error) {
+            foreach ($_SESSION['errorMessage'] as $error) {
                 echo '<div class="manageError">' . $error . '</div>';
             }
             echo '</div>';
         }
     }
 
-    public function dropdownMenu()
+    // generate options for principal colours select field
+    public function coloursDropdown()
     {
         foreach ($this->principleColoursList as $key => $value) {
             echo '<option class="colourOption">' . $value . '</option>';
         }
     }
 
+    // list of all (if not, then at least most) css colour names
+    //
+    // scraped the data/colours with simple JS program
+    // source: http://www.colors.commutercreative.com/grid/
+    //
+    // 1) used in process of generating the colours select field
+    // 2) used in colour validation process
     public $principleColoursList = [
         'aliceblue' => 'alice blue',
         'antiquewhite' => 'antique white',

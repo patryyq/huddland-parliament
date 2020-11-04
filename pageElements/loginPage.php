@@ -1,14 +1,4 @@
 <?php
-// This file is used to render HTML content for "login.php" page
-//
-//
-//
-// 
-if ($user->isLoggedIn()) {
-    header('Location: ' . APPLOCATION);
-} else if (isset($_POST['email']) || isset($_POST['password'])) {
-    $user->logIn() ? header('Location: ' . APPLOCATION) : false;
-}
 header('Content-type: text/html; charset=utf-8');
 ?>
 <!DOCTYPE html>

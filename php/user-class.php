@@ -1,6 +1,5 @@
 <?php
 
-
 class user
 {
     public $name;
@@ -36,7 +35,7 @@ class user
                 // set isLoggedIn session variable to true, also set admin variable based on 'role' from db
                 $_SESSION['isLoggedIn'] = true;
                 $_SESSION['name'] = $result[0]['name'];
-                ($result[0]['role'] == '2') ? $_SESSION['admin'] = true : $_SESSION['admin'] = false;
+                $_SESSION['admin'] = $result[0]['role'] == '2' ? true : false;
                 return true;
             } else {
                 $this->error = "Email or password doesn't match.<br>";
@@ -48,13 +47,8 @@ class user
 
     public function logOut()
     {
-        unset($_SESSION['isLoggedIn']);
-        unset($_SESSION['name']);
-        unset($_SESSION['admin']);
         session_destroy();
-        // header to APPLOCATION, but will get redirected to login page anyways
         header('Location: ' . LOGINPAGE);
-        exit();
     }
 
     // return errors from $this->error
@@ -72,7 +66,7 @@ class user
         return password_verify($password, $hashFromDb) ? true : false;
     }
 
-    // get the details needed to log in based on provided email; return false if no email marched
+    // get the details needed to log in based on provided email; return false if no email matched
     private function getDetailsToLogIn()
     {
         $query = "SELECT name, password, email, id, role FROM users WHERE email = ?";
