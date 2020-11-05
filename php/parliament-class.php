@@ -18,7 +18,9 @@ class parliament
         // used GROUP_CONCAT to gather all interests as single string
         // rather than having duplicated results/rows with only different interest
         $query =
-            "SELECT members.id, members.firstname, members.party_id, members.lastname, members.date_of_birth, parties.name, parties.date_of_foundation, parties.principal_colour, constituencies.region, constituencies.electorate, constituencies.id AS constiID,
+            "SELECT members.id, members.firstname, members.party_id, members.lastname, members.date_of_birth, 
+            parties.name, parties.date_of_foundation, parties.principal_colour, constituencies.region, 
+            constituencies.electorate, constituencies.id AS constiID,
             GROUP_CONCAT(interests.name SEPARATOR ', ') AS interests,
             GROUP_CONCAT(interests.id SEPARATOR ',') AS interestsID
             FROM members

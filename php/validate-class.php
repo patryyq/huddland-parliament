@@ -69,9 +69,12 @@ class validate
         }
     }
 
-    // validate multiple words: region, interests, party
+    // validate multiple words: region, interest, party
     //
     // each word length >= 2
+    // check if whole string longer than 2 - it will
+    // accept words like "of" or "as" but not on its own
+    //
     // only letters and '-,
     public function multipleWords($string, $field)
     {
@@ -87,7 +90,7 @@ class validate
                 $result = false;
             }
         }
-        if ($result === true) {
+        if ($result === true && strlen($string) > 2) {
             $_SESSION[$field] = $string;
             return $string;
         } else {

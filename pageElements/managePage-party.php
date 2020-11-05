@@ -69,6 +69,10 @@
         select.style.display = 'block';
     }
 
+    // changeColour = function() {
+    //     if (input)
+    // }
+
     input.addEventListener('focus', openSelect);
     input.addEventListener('keyup', searchColour);
     body.addEventListener('click', function(event) {
@@ -80,6 +84,7 @@
     select.addEventListener('click', function(event) {
         if (event.target.classList.contains('colourOption')) {
             input.value = event.target.innerText;
+            input.style = 'padding: 8px;border:4px solid ' + event.target.innerText.replace(/\s/g, '');
             select.style.display = 'none';
         }
     });

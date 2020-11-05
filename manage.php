@@ -26,7 +26,7 @@ if ($addMp) {
     die();
 }
 
-// if no message or error, and $_GET is set (someone must have put it manually)
+// if no message or error, and $_GET is set (someone must have put it manually or page refreshed)
 // then remove the parameter (header location) because JS will generate error trying to get
 // element (message/error div) which doesnt exist;
 if ((isset($_GET['mp']) ||
