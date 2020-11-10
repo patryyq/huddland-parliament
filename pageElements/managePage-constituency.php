@@ -2,8 +2,8 @@
 
 ?>
 <div id="constituencyTab" class="manageTitle">Constituency</div>
-<div class="manageContent none">
-    <div id="addConstituency" class="flex" style="justify-content:space-between">
+<div class="manageContent">
+    <div id="addConstituency" class="flex toggle-content">
         <p>New <b>constituency</b> details:</p>
         <form method="POST" action="" class="flexForm">
             <div style="width:48%">

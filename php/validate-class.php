@@ -76,7 +76,7 @@ class validate
     // accept words like "of" or "as" but not on its own
     //
     // only letters and '-,
-    public function multipleWords($string, $field)
+    public function multipleWords($string, $field = false)
     {
         // split string containing many words
         // into array with separate words
@@ -91,7 +91,9 @@ class validate
             }
         }
         if ($result === true && strlen($string) > 2) {
-            $_SESSION[$field] = $string;
+            if ($field) {
+                $_SESSION[$field] = $string;
+            }
             return $string;
         } else {
             if ($field == 'partyName') {
@@ -169,7 +171,7 @@ class validate
     {
         $db = new db();
         $fieldName = $table;
-        $table == 'party' ? $table = $db->getAllParties() : ($table == 'mp' ? $table = $db->getAllMp() : ($table == 'constituency' ? $table = $db->getAllConstituencies() : false));
+        $table == 'party' ? $table = $db->getAllParties() : ($table == 'mp' ? $table = $db->getAllMp() : ($table == 'constituency' ? $table = $db->getAllConstituencies() : ($table == 'interestSearch' ? $table = $db->getAllInterests() : false)));
         $result = false;
         if (is_numeric($id)) {
             foreach ($table as $row) {

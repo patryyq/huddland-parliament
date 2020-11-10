@@ -2,8 +2,8 @@
 
 ?>
 <div id="interests" class="manageTitle">Interest</div>
-<div class="manageContent none">
-    <div id="addInterest" class="flex" style="justify-content:space-between">
+<div class="manageContent">
+    <div id="addInterest" class="flex toggle-content">
         <p>New <b>interest</b> details:</p>
         <form method="POST" action="" class="flexForm">
             <div style="width:48%">

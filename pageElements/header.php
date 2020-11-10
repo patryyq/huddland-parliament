@@ -3,11 +3,13 @@ header('Content-type: text/html; charset=utf-8');
 
 $headerCookie = $_COOKIE['header'] ?? 1;
 if ($headerCookie == 0) {
-    $header = 'class="none"';
+    $topDesc = 'class="none"';
     $button = 'class="hidden"';
+    $header = 'class="header headerSmall"';
 } else {
-    $header = 'class="flex"';
+    $topDesc = 'class="flex"';
     $button = 'class="visible"';
+    $header = 'class="header"';
 }
 ?>
 <!DOCTYPE html>
@@ -28,18 +30,20 @@ if ($headerCookie == 0) {
             </div>
             <div id="menuItems" class="flex">
                 <?php echo ($user->admin ? '<a href="manage.php"><div class="menuElement">Add content</div></a>' : FALSE);  ?>
-
+                <a href="">
+                    <div class="menuElement">Parliament</div>
+                </a>
                 <a href="?logout">
                     <div class="menuElement">Logout</div>
                 </a>
             </div>
         </div>
     </nav>
-    <header id="header" <?php echo $header; ?>>
-        <div class="header">
+    <header id="header">
+        <div <?php echo $header; ?>>
             <div class="headerText">
                 <h1>Huddland Parliament</h1>
-                The Huddland Parliament has two Houses that work on behalf of Huddland citizens to check and challenge the work of Government, make and shape effective laws, and debate/make decisions on the big issues of the day.
+                <div id="topDesc" <?php echo $topDesc; ?>>The Huddland Parliament has two Houses that work on behalf of Huddland citizens to check and challenge the work of Government, make and shape effective laws, and debate/make decisions on the big issues of the day.</div>
             </div>
         </div>
     </header>

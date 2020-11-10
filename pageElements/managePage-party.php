@@ -2,8 +2,8 @@
 
 ?>
 <div id="parties" class="manageTitle">Party</div>
-<div class="manageContent none">
-    <div id="addParty" class="flex" style="justify-content:space-between">
+<div class="manageContent">
+    <div id="addParty" class="flex toggle-content">
         <p>New <b>party</b> details:</p>
         <form method="POST" action="" class="flexForm">
             <div style="width:48%">
@@ -65,9 +65,11 @@
         }
     };
 
-    openSelect = function() {
+    openSelect = function(event) {
         select.style.display = 'block';
+        input.parentElement.parentElement.parentElement.style.overflow = 'visible';
     }
+
 
     // changeColour = function() {
     //     if (input)
@@ -79,13 +81,16 @@
         if (!event.target.classList.contains('colourOption') &&
             event.target.getAttribute('id') != 'principalColour') {
             select.style.display = 'none';
+            input.parentElement.parentElement.parentElement.style.overflow = 'hidden';
         }
     })
     select.addEventListener('click', function(event) {
         if (event.target.classList.contains('colourOption')) {
+            console.log(event.target.innerText);
             input.value = event.target.innerText;
-            input.style = 'padding: 8px;border:4px solid ' + event.target.innerText.replace(/\s/g, '');
+            input.style = 'padding: 8px;margin-bottom:0;border:4px solid ' + event.target.innerText.replace(/\s/g, '');
             select.style.display = 'none';
+            input.parentElement.parentElement.parentElement.style.overflow = 'hidden';
         }
     });
 </script>

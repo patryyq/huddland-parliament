@@ -2,8 +2,8 @@
 
 ?>
 <div id="mp" class="manageTitle">MP</div>
-<div class="manageContent none">
-    <div id="addMp" class="flex" style="justify-content:space-between">
+<div class="manageContent">
+    <div id="addMp" class="flex toggle-content">
         <p>New <b>MP</b> details:</p>
         <form method="POST" action="" class="flexForm">
             <div style="width:48%">
@@ -18,12 +18,12 @@
                 <label for="dateOfBirth">Date of birth:</label><br>
                 <input type="date" name="dateOfBirth" value="<?php echo $_SESSION['dateOfBirth'] ?? false; ?>"></div>
             <div style="width:48%"><label for="party">Party:</label><br>
-                <?php echo $parliament->displayPartiesList(); ?> </div>
+                <?php echo $parliament->displayPartiesList('Select party'); ?> </div>
             <div style="width:48%"><label for="constituency">Constituency:</label><br>
-                <?php echo $parliament->displayConstituenciesList(); ?></div>
+                <?php echo $parliament->displayConstituenciesList('Select constituency'); ?></div>
             <p>Interests:</p>
             <div style="width:100%" id="interestsBoxes" class="flex">
-                <?php echo $parliament->displayInterestsList(false); ?>
+                <?php echo $parliament->displayInterests('checkbox'); ?>
             </div>
             <p style="margin-top: 3em;">Do you want to add a new <b>MP</b>?</p>
             <div style="width:48%"> <input type="submit" name="addMpButton" value="Add MP"></div>

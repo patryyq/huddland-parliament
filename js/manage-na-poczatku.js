@@ -1,72 +1,3 @@
-// Show an element
-var show = function (elem) {
-  // Get the natural height of the element
-  var getHeight = function () {
-    elem.style.display = 'block'; // Make it visible
-    var height = elem.scrollHeight + 'px'; // Get it's height
-    elem.style.display = ''; //  Hide it again
-    return height;
-  };
-
-  var height = getHeight(); // Get the natural height
-  elem.classList.add('is-visible'); // Make the element visible
-  elem.style.height = height; // Update the max-height
-  elem.parentElement.previousElementSibling.style.backgroundImage =
-    "url('img/arrow-down-1.png')";
-
-  // Once the transition is complete, remove the inline max-height so the content can scale responsively
-  window.setTimeout(function () {
-    elem.style.height = '';
-  }, 250);
-};
-
-// Hide an element
-var hide = function (elem) {
-  // Give the element a height to change from
-  elem.style.height = elem.scrollHeight + 'px';
-  elem.parentElement.previousElementSibling.style.backgroundImage =
-    "url('img/arrow-right-1.png')";
-
-  // Set the height back to 0
-  window.setTimeout(function () {
-    if (elem.classList.contains('toggle-more')) {
-      elem.style.height = '160px';
-    } else {
-      elem.style.height = '0';
-    }
-  }, 1);
-
-  // When the transition is complete, hide it
-  window.setTimeout(function () {
-    elem.classList.remove('is-visible');
-  }, 350);
-};
-
-// Toggle element visibility
-var toggle = function (elem) {
-  // If the element is visible, hide it
-  if (elem.classList.contains('is-visible')) {
-    hide(elem);
-    return;
-  }
-
-  // Otherwise, show it
-  show(elem);
-};
-
-// Listen for click events
-document.addEventListener(
-  'click',
-  function (event) {
-    if (!event.target.classList.contains('manageTitle')) return;
-    let element = event.target.nextElementSibling.firstElementChild;
-    if (!element) return;
-    // Toggle the element
-    toggle(element);
-  },
-  false
-);
-
 // get currently set GET parameters
 function urlParams() {
   let url = new URL(window.location.href);
@@ -115,14 +46,22 @@ const openTab = {
     }
   },
 
+  closeAllTabs: function () {
+    this.mp.nextElementSibling.classList.replace('flex', 'none');
+    this.addMp.classList.replace('flex', 'none');
+    this.mp.style.backgroundImage = "url('img/arrow-right-1.png')";
+  },
   //
   //
   // manage MP tab
   //
   //
   mp: document.getElementById('mp'),
+  addMp: document.getElementById('addMp'),
+
   openMp: function () {
-    this.mp.nextElementSibling.firstElementChild.classList.add('is-visible');
+    this.mp.nextElementSibling.classList.replace('none', 'flex');
+    this.addMp.classList.replace('none', 'flex');
     this.mp.style.backgroundImage = "url('img/arrow-down-1.png')";
   },
 
@@ -132,8 +71,11 @@ const openTab = {
   //
   //
   party: document.getElementById('parties'),
+  addParty: document.getElementById('addParty'),
+
   openParty: function () {
-    this.party.nextElementSibling.firstElementChild.classList.add('is-visible');
+    this.party.nextElementSibling.classList.replace('none', 'flex');
+    this.addParty.classList.replace('none', 'flex');
     this.party.style.backgroundImage = "url('img/arrow-down-1.png')";
   },
 
@@ -143,10 +85,11 @@ const openTab = {
   //
   //
   interest: document.getElementById('interests'),
+  addInterest: document.getElementById('addInterest'),
+
   openInterest: function () {
-    this.interest.nextElementSibling.firstElementChild.classList.add(
-      'is-visible'
-    );
+    this.interest.nextElementSibling.classList.replace('none', 'flex');
+    this.addInterest.classList.replace('none', 'flex');
     this.interest.style.backgroundImage = "url('img/arrow-down-1.png')";
   },
   //
@@ -155,12 +98,43 @@ const openTab = {
   //
   //
   constituency: document.getElementById('constituencyTab'),
+  addConstituency: document.getElementById('addConstituency'),
 
   openConstituency: function () {
-    this.constituency.nextElementSibling.firstElementChild.classList.add(
-      'is-visible'
-    );
+    this.constituency.nextElementSibling.classList.replace('none', 'flex');
+    this.addConstituency.classList.replace('none', 'flex');
     this.constituency.style.backgroundImage = "url('img/arrow-down-1.png')";
+  },
+  //
+  //
+  // open/close any tab on click;
+  //
+  // confirmation on 'submit'
+  //
+  //
+  manage: document.getElementById('manage'),
+  wrapper: document.getElementsByClassName('wrapper')[0],
+  openTabOnClick: function (event) {
+    if (event.target.classList.contains('manageTitle')) {
+      let buttonStatus = event.target.nextElementSibling.classList.contains(
+        'none'
+      );
+      let allTitles = document.getElementsByClassName('manageTitle');
+      //  // clsoes all tabs
+      // for (let i = 0; i < allTitles.length; i++) {
+      //   if (allTitles[i].nextElementSibling.classList.contains('flex')) {
+      //     allTitles[i].style.backgroundImage = 'url("img/arrow-right-1.png")';
+      //     allTitles[i].nextElementSibling.classList.replace('flex', 'none');
+      //   }
+      // }
+      if (buttonStatus) {
+        event.target.style.backgroundImage = "url('img/arrow-down-1.png')";
+        event.target.nextElementSibling.classList.replace('none', 'flex');
+      } else {
+        event.target.style.backgroundImage = "url('img/arrow-right-1.png')";
+        event.target.nextElementSibling.classList.replace('flex', 'none');
+      }
+    }
   },
 
   confirmAction: function (event) {
@@ -172,10 +146,10 @@ const openTab = {
     }
   },
 
-  wrapper: document.getElementById('manage'),
   // keep all eventListeners in one method
   eventListeners: function () {
     this.wrapper.addEventListener('click', this.confirmAction);
+    this.manage.addEventListener('click', this.openTabOnClick);
   },
 
   markErrorFields: function (section) {
@@ -214,8 +188,7 @@ openTab.eventListeners();
 let confirmation = document.getElementById('confirmation');
 let error = document.getElementById('errorMessage');
 if (confirmation === null && error !== null) {
-  // without delay, it wouldn't 'scroll into' desired location
   setTimeout(function () {
     error.scrollIntoView();
-  }, 60);
+  }, 30);
 }

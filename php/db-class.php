@@ -138,10 +138,11 @@ class db
 
     // functions to get all rows from certain category
     //
-    // all MPs
+    // all MPs and their parties + colour
     public function getAllMp()
     {
-        $query = "SELECT id, firstname, lastname FROM members";
+        $query = "SELECT members.id, members.firstname, members.lastname, parties.name,parties.principal_colour FROM members
+        LEFT JOIN parties ON parties.id = members.party_id";
         return $this->selectQuery($query);
     }
 
@@ -164,5 +165,59 @@ class db
     {
         $query = "SELECT id, region, electorate FROM constituencies";
         return $this->selectQuery($query);
+    }
+
+    // number of functions used in search feature
+    // 
+    //
+    public function searchMPname($MPname)
+    {
+        // if more than 1 word
+        // match firstname and lastname
+        if (count(explode(' ', $MPname)) > 1) {
+            $firstname = explode(' ', $MPname)[0];
+            $lastname = str_replace($firstname . ' ', '', $MPname);
+            $query = "SELECT id FROM members WHERE firstname = ? AND lastname = ?";
+            $result = $this->selectQuery($query, [$firstname, $lastname]);
+
+            // if 1 word, match firstname or lastname
+        } else if (count(explode(' ', $MPname)) === 1) {
+            $query = "SELECT id FROM members WHERE firstname = ? OR lastname = ?";
+            $result = $this->selectQuery($query, [$MPname, $MPname]);
+        }
+        return (count($result) > 0 ? $result : false);
+    }
+
+    public function searchMpPartyID($partyID)
+    {
+        $query = "SELECT id FROM members WHERE party_id = ?";
+        return $this->selectQuery($query, [$partyID]);
+    }
+
+    public function searchMpInterestID($interestID)
+    {
+        $query = "SELECT member_id AS id FROM interest_member WHERE interest_id = ?";
+        return $this->selectQuery($query, [$interestID]);
+    }
+
+    public function searchMpConstituencyID($constituencyID)
+    {
+        $query = "SELECT id FROM members WHERE constituency_id = ?";
+        return $this->selectQuery($query, [$constituencyID]);
+    }
+
+    // function to get details of all MPs matching the search criteria
+    // to be send as response to JS
+    public function getMatchingSearchMP($arrayWithIDs)
+    {
+        $results = [];
+        foreach ($arrayWithIDs as $MPid) {
+            $query = "SELECT members.id, members.firstname, members.lastname, parties.name,parties.principal_colour FROM members
+            LEFT JOIN parties ON parties.id = members.party_id
+            WHERE members.id = ?";
+            $singleResult = $this->selectQuery($query, [$MPid])[0];
+            array_push($results, $singleResult);
+        }
+        return $results;
     }
 }

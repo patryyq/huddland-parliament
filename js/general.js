@@ -1,5 +1,6 @@
 const xButton = document.getElementById('xButton');
-const header = document.getElementById('header');
+const header = document.getElementsByClassName('header')[0];
+const topDesc = document.getElementById('topDesc');
 
 function setCookie(value, name) {
   let now = new Date();
@@ -10,13 +11,15 @@ function setCookie(value, name) {
 }
 
 xButton.addEventListener('click', function () {
-  if (header.classList.contains('flex')) {
-    header.classList.replace('flex', 'none');
+  if (topDesc.classList.contains('flex')) {
+    topDesc.classList.replace('flex', 'none');
     xButton.classList.replace('visible', 'hidden');
+    header.classList.add('headerSmall');
     setCookie(0, 'header');
   } else {
-    header.classList.replace('none', 'flex');
+    topDesc.classList.replace('none', 'flex');
     xButton.classList.replace('hidden', 'visible');
+    header.classList.remove('headerSmall');
     setCookie(1, 'header');
   }
 });
