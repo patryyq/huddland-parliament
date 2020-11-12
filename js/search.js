@@ -1,5 +1,6 @@
 const searchButton = document.getElementById('searchButton');
 const filters = document.getElementById('filters');
+const filtersHeight = filters.scrollHeight;
 const MPname = document.getElementById('MPname');
 const party = document.getElementById('party');
 const constituency = document.getElementById('constituency');
@@ -12,6 +13,9 @@ const filterParty = document.getElementById('filterParty');
 const filterConstituency = document.getElementById('filterConstituency');
 const filterInterest = document.getElementById('filterInterest');
 const filterNone = document.getElementById('filterNone');
+const showHideButton = document.getElementById('showHideFilters');
+const searchBarHeight = document.getElementById('searchInputsWrapper')
+  .scrollHeight;
 
 // Compare last params with current params to avoid sending same request
 // (in case user spam clicks Search button).
@@ -239,7 +243,7 @@ function displayActiveFilters() {
   }
   if (anyFilterSet === false) {
     filterNone.style.display = 'inline-block';
-    browseText.innerText = 'All Huddland MPs:';
+    browseText.innerText = 'Huddland Parliament MPs:';
     browseResults.innerHTML = browseResultsInitial;
   } else {
     filterNone.style.display = 'none';
@@ -284,3 +288,30 @@ filters.addEventListener('click', closeFilters);
 // (false) - get data from URL rather than search/input fields
 // So, on page load, check if parameters in URL are set and behave accordingly.
 searchRequest(false);
+
+// If no parameters set and 'filter' cookie to 0 => hide filters
+let urlSearch = urlParams();
+if (
+  !urlSearch.has('MPname') &&
+  !urlSearch.has('party') &&
+  !urlSearch.has('interest') &&
+  !urlSearch.has('constituency') &&
+  getCookie('filters') == 0
+) {
+  let element = document.getElementById('searchInputsWrapper');
+  hide(element, 3);
+} else {
+  // Scenario: User clicks 'Hide Filters', but some filters are active. Right now, the search bar will close
+  // and cookie set to 0. So, if users refreshes the page (with params), the search bar will open,
+  // but if user removes filters and refreshes again, it will close, because cookie was set to 0.
+  //
+  // Same scenario as above, but below line uncommented - if user refreshes page, with cookie 0 but params set,
+  // the search bar after reload will be open and cookie set to 1. So, on next page reload (even if no params set)
+  // search bar will open anyways.
+  // (not sure if that makes sense...)
+  //
+  // It's one of them where it's difficult to choose the right behavior. For some
+  // users this way will be natural way, for others the other.
+  //
+  // setCookie(1, 'filters');
+}

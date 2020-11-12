@@ -31,7 +31,7 @@ header('Content-type: text/html; charset=utf-8');
         </div>
     </nav>
     <header id="header">
-        <div id="toggleHeader" class="header header-vis">
+        <div id="toggleHeader" class="header vis">
             <div class="headerText">
                 <h1>Huddland Parliament</h1>
                 <div id="topDesc" style="height:auto;opacity:1;transition:unset">The Huddland Parliament has two Houses that work on behalf of Huddland citizens to check and challenge the work of Government, make and shape effective laws, and debate/make decisions on the big issues of the day.</div>

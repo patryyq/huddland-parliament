@@ -8,7 +8,7 @@
         <form method="POST" action="" class="flexForm">
             <div class="inputWrapper">
                 <label for="interestName">region</label>
-                <input type="text" name="constituencyRegion" value="<?php echo $_SESSION['constituencyRegion'] ?? false; ?>">
+                <input type="text" autocomplete="off" name="constituencyRegion" value="<?php echo $_SESSION['constituencyRegion'] ?? false; ?>">
             </div>
             <div class="inputWrapper">
                 <label for="electorate">electorate</label>

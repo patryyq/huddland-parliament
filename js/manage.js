@@ -1,10 +1,3 @@
-// get currently set GET parameters
-function urlParams() {
-  let url = new URL(window.location.href);
-  let params = new URLSearchParams(url.search);
-  return params;
-}
-
 // if user has selected one of the optionsl on refresh keep that tab open
 const openTab = {
   //self: this, // workaround to use methods inside other methods

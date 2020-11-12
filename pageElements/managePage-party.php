@@ -8,7 +8,7 @@
         <form method="POST" action="" class="flexForm">
             <div class="inputWrapper">
                 <label for="partyName">name</label>
-                <input type="text" name="partyName" value="<?php echo $_SESSION['partyName'] ?? false; ?>">
+                <input type="text" autocomplete="off" name="partyName" value="<?php echo $_SESSION['partyName'] ?? false; ?>">
             </div>
             <div class="inputWrapper">
                 <label for="dateOfFoundation">year of foundation</label>

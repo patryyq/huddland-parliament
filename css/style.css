@@ -49,7 +49,7 @@ header {
   background: #fff;
   color: #071c4a;
   width: 100%;
-  border-bottom: 4px solid #071c4a;
+  border-bottom: 3px solid #071c4a;
 }
 
 nav {
@@ -213,7 +213,7 @@ footer {
 
 .browseResults {
   margin-bottom: 5em;
-  padding: 0 1em;
+  padding: 0 2em;
   width: 100%;
   display: flex;
   flex-wrap: wrap;
@@ -223,9 +223,11 @@ footer {
 #browseText {
   width: 100%;
   font-size: 2.25em;
+  box-sizing: border-box;
   font-weight: bold;
   color: #071c4a;
-  margin: 0.5em 0 0.3em 2em;
+  padding: 0.5em 0 0.3em 2em;
+  text-align: center;
 }
 
 #randomFace {
@@ -441,19 +443,26 @@ input[type='date'].successField {
 #searchBar {
   box-sizing: border-box;
   width: 100%;
-  padding: 2em 2em 1em 2em;
+  padding: 1.1em 2em 1em 2em;
   background: #ebe9e9;
-  border-bottom: 6px solid #071c4a;
+  /* border-bottom: 3px solid #071c4a; */
+}
+
+#searchInputsWrapper {
+  overflow: hidden;
   justify-content: space-between;
+  transition: height 350ms ease-in-out, margin-top 350ms ease-in-out;
 }
 
 #filters {
   width: 100%;
-  padding: 1em;
+  padding: 1em 2em 1em 1em;
   padding-bottom: 0;
   font-size: 1.2em;
+  overflow: hidden;
   box-sizing: border-box;
   text-align: right;
+  transition: height 350ms ease-in-out;
 }
 
 .filter {
@@ -494,7 +503,7 @@ input[type='date'].successField {
   box-sizing: border-box;
   width: 1000px;
   margin-bottom: 5em;
-  padding: 1em;
+  padding: 1em 2em;
 }
 .manage {
   margin: 2em 0;
@@ -539,6 +548,17 @@ input[type='date'].successField {
 }
 
 #xButton:hover {
+  cursor: pointer;
+}
+
+.showHideFilters {
+  background: #071c4a;
+  border-radius: 1em;
+  padding: 0.2em 0.5em;
+  font-size: 1.2em;
+  color: #fff;
+  margin-left: 1em;
+  float: right;
   cursor: pointer;
 }
 
@@ -617,6 +637,14 @@ body {
     width: 100%;
   }
 
+  #filters {
+    font-size: 1em;
+  }
+
+  .browseResults {
+    padding: 0 1em;
+  }
+
   h1 {
     font-size: 2.2em;
     margin: 1em 1em;
@@ -626,12 +654,19 @@ body {
     width: 50%;
   }
 
+  .confirmation {
+    padding: 0.5em;
+    font-size: 1.3em;
+    margin: 0.5em;
+  }
+
   #searchButton {
     width: 100%;
   }
 
   .wrapper {
     margin-bottom: 3em;
+    padding: 1em;
   }
 
   #menuItems {
@@ -679,7 +714,10 @@ body {
   }
 
   #searchBar {
-    padding: 1.5em 1em;
+    padding: 1em 1em;
+  }
+
+  #searchInputsWrapper {
     justify-content: center;
   }
 
@@ -731,7 +769,7 @@ body {
 
   #browseText {
     font-size: 1.4em;
-    margin: 1em 0 0.6em 1em;
+    padding: 1em 0 0.6em 1em;
   }
 
   #xButton {

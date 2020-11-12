@@ -4,6 +4,13 @@ const topDesc = document.getElementById('topDesc');
 const menuBurger = document.getElementById('menuBurger');
 const headerHeight = document.getElementById('toggleHeader').scrollHeight;
 
+// Get currently set GET/URL parameters.
+function urlParams() {
+  let url = new URL(window.location.href);
+  let params = new URLSearchParams(url.search);
+  return params;
+}
+
 function setCookie(value, name) {
   let now = new Date();
   // expiry date; nearly forever
@@ -42,37 +49,47 @@ function menuResponsive(event) {
 }
 
 // Show an element
-var show = function (elem, header = false) {
+var show = function (elem, header = 1) {
   // Get the natural height of the element
   var getHeight = function (header) {
-    if (!header) {
+    if (header === 1) {
       elem.style.display = 'block'; // Make it visible
       var height = elem.scrollHeight + 'px'; // Get it's height
       elem.style.display = ''; //  Hide it again
-    } else {
+    } else if (header === 2) {
       var height = headerHeight;
+    } else if (header === 3) {
+      var height = searchBarHeight;
     }
     return height;
   };
 
   var height = getHeight(header); // Get the natural height
-  if (!header) {
+  if (header === 1) {
     elem.style.height = height;
-  } else {
+  } else if (header === 2) {
     elem.style = 'height:' + height + 'px';
-  } // Update the max-height
+  } else if (header === 3) {
+    elem.style = 'height:' + height + 'px;margin-top:0.8em';
+    showHideButton.innerText = 'Hide Filters';
+    filters.style = 'height:' + filtersHeight + 'px';
+  }
 
-  if (!header) {
+  if (header === 1) {
     elem.parentElement.previousElementSibling.style.backgroundImage =
       "url('img/arrow-down-1.png')";
     elem.classList.add('is-visible'); // Make the element visible
-  } else {
+  } else if (header === 2) {
     elem.classList.remove('headerSmall');
     topDesc.style = 'height:auto;opacity: 1';
     xButton.classList.replace('hidden', 'visible');
-    elem.classList.add('header-vis'); // Make the element visible
+    elem.classList.add('vis'); // Make the element visible
     setCookie(1, 'header');
+  } else if (header === 3) {
+    elem.classList.add('vis'); // Make the element visible
+    setCookie(1, 'filters');
   }
+
   // Once the transition is complete, remove the inline max-height so the content can scale responsively
   window.setTimeout(function () {
     elem.style.height = '';
@@ -81,13 +98,13 @@ var show = function (elem, header = false) {
 };
 
 // Hide an element
-function hide(elem, header = false) {
+function hide(elem, header = 1) {
   // Give the element a height to change from
   elem.style.height = elem.scrollHeight + 'px';
-  if (!header) {
+  if (header === 1) {
     elem.parentElement.previousElementSibling.style.backgroundImage =
       "url('img/arrow-right-1.png')";
-  } else {
+  } else if (header === 2) {
     if (getCookie('header') == 0) {
       topDesc.style = 'height:0px;opacity:0;transition:unset';
     } else {
@@ -96,6 +113,13 @@ function hide(elem, header = false) {
     xButton.classList.replace('visible', 'hidden');
     elem.classList.add('headerSmall');
     setCookie(0, 'header');
+  } else if (header === 3) {
+    if (filterNone.style.display === 'inline-block') {
+      filters.style = 'height: 0;margin-top: 0';
+    }
+    elem.style.marginTop = '0';
+    showHideButton.innerText = 'Show Filters';
+    setCookie(0, 'filters');
   }
 
   // Set the height back to 0
@@ -109,21 +133,26 @@ function hide(elem, header = false) {
 
   // When the transition is complete, hide it
   window.setTimeout(function () {
-    if (!header) {
+    if (header === 1) {
       elem.classList.remove('is-visible');
-    } else {
-      elem.classList.remove('header-vis');
+    } else if (header === 2) {
+      elem.classList.remove('vis');
+    } else if (header === 3) {
+      elem.classList.remove('vis');
     }
   }, 350);
 }
 
 // Toggle element visibility
-var toggle = function (elem, header = false) {
-  // If the element is visible, hide it
+// 1 => manage tabs
+// 2 => header
+// 3 => search filters
+var toggle = function (elem, header = 1) {
+  // If the element is visible, hide it.
   if (elem.classList.contains('is-visible')) {
     hide(elem, header);
     return;
-  } else if (elem.classList.contains('header-vis')) {
+  } else if (elem.classList.contains('vis')) {
     hide(elem, header);
     return;
   }
@@ -158,10 +187,13 @@ document.addEventListener(
   function (event) {
     if (event.target.classList.contains('manageTitle')) {
       let element = event.target.nextElementSibling.firstElementChild;
-      toggle(element, false);
+      toggle(element, 1);
     } else if (event.target.getAttribute('id') === 'xButton') {
       let element = document.getElementById('toggleHeader');
-      toggle(element, true);
+      toggle(element, 2);
+    } else if (event.target.getAttribute('id') === 'showHideFilters') {
+      let element = document.getElementById('searchInputsWrapper');
+      toggle(element, 3);
     }
   },
   false
@@ -170,5 +202,5 @@ document.addEventListener(
 if (getCookie('header') == 0) {
   let element = document.getElementById('toggleHeader');
   element.style.transition = 'none';
-  hide(element, true);
+  hide(element, 2);
 }

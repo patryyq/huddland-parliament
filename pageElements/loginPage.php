@@ -17,7 +17,7 @@ header('Content-type: text/html; charset=utf-8');
         <form method="POST" action="" class="flex">
             <?php echo $user->getError(); ?>
             <input type="email" name="email" placeholder="Email" value="<?php echo $user->email; ?>">
-            <input type="text" name="password" placeholder="Password">
+            <input type="text" name="password" id="password" placeholder="Password">
             <input type="submit" name="submit" value="Sign in">
         </form>
     </div>
@@ -28,6 +28,15 @@ source: https://stackoverflow.com/questions/6320113/how-to-prevent-form-resubmis
         if (window.history.replaceState) {
             window.history.replaceState(null, null, window.location.href);
         }
+
+        // Password field is 'text' type initially, to get around Chrome's autocomplete=off thing.
+        // On password input field 'focus', change the type to 'password'.
+        function changeInputTextToPassword(event) {
+            event.path[0].type = 'password';
+        }
+
+        const passwordInputField = document.getElementById('password');
+        passwordInputField.addEventListener('focus', changeInputTextToPassword)
     </script>
 </body>
 

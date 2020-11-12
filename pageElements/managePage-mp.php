@@ -8,11 +8,11 @@
         <form method="POST" action="" class="flexForm">
             <div class="inputWrapper">
                 <label for="name">first name</label>
-                <input type="text" name="firstname" value="<?php echo $_SESSION['firstname'] ?? false; ?>">
+                <input type="text" autocomplete="off" name="firstname" value="<?php echo $_SESSION['firstname'] ?? false; ?>">
             </div>
             <div class="inputWrapper">
                 <label for="name">last name</label>
-                <input type="text" name="lastname" value="<?php echo $_SESSION['lastname'] ?? false; ?>">
+                <input type="text" autocomplete="off" name="lastname" value="<?php echo $_SESSION['lastname'] ?? false; ?>">
             </div>
             <div class="inputWrapper">
                 <label for="dateOfBirth">date of birth</label>
