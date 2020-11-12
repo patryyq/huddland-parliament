@@ -6,16 +6,16 @@
     <div id="addConstituency" class="flex toggle-content">
         <p>New <b>constituency</b> details:</p>
         <form method="POST" action="" class="flexForm">
-            <div style="width:48%">
-                <label for="interestName">Region:</label><br>
-                <input type="text" placeholder="Region name" name="constituencyRegion" value="<?php echo $_SESSION['constituencyRegion'] ?? false; ?>">
+            <div class="inputWrapper">
+                <label for="interestName">region</label>
+                <input type="text" name="constituencyRegion" value="<?php echo $_SESSION['constituencyRegion'] ?? false; ?>">
             </div>
-            <div style="width:48%">
-                <label for="electorate">Electorate:</label><br>
-                <input type="number" placeholder="Electorate number" name="electorate" value="<?php echo $_SESSION['electorate'] ?? false; ?>">
+            <div class="inputWrapper">
+                <label for="electorate">electorate</label>
+                <input type="number" name="electorate" value="<?php echo $_SESSION['electorate'] ?? false; ?>">
             </div>
             <p style="margin-top: 3em;">Do you want to add a new <b>constituency</b>?</p>
-            <div style="width:48%"> <input type="submit" name="addConstituencyButton" value="Add constituency"></div>
+            <div class="inputWrapper"> <input type="submit" name="addConstituencyButton" value="Add constituency"></div>
         </form>
     </div>
 </div>

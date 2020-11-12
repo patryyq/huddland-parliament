@@ -1,5 +1,4 @@
 const searchButton = document.getElementById('searchButton');
-const searchBar = document.getElementById('searchBar');
 const filters = document.getElementById('filters');
 const MPname = document.getElementById('MPname');
 const party = document.getElementById('party');
@@ -7,56 +6,116 @@ const constituency = document.getElementById('constituency');
 const interest = document.getElementById('interestSearch');
 const browseResults = document.getElementById('browseResults');
 const browseResultsInitial = document.getElementById('browseResults').innerHTML;
+const browseText = document.getElementById('browseText');
 const filterMP = document.getElementById('filterMP');
 const filterParty = document.getElementById('filterParty');
 const filterConstituency = document.getElementById('filterConstituency');
 const filterInterest = document.getElementById('filterInterest');
 const filterNone = document.getElementById('filterNone');
 
-async function searchRequest() {
+// Compare last params with current params to avoid sending same request
+// (in case user spam clicks Search button).
+//
+// As string because it's simplest way to store and compare:
+// lastParams/currentParams = MPname + party + constituency + interest
+// lastParams !== currentParams
+//
+// (could bypass that by JS code manipulation, therefore server-side solution
+// on top of that needed anyway - keep requests data (or count) in $_SESSION or something)
+//
+// (avoid needless requests)
+let lastParams = '';
+async function searchRequest(pageLoad = true) {
   let send = false;
   let url = new URL(window.location.href);
   url = new URLSearchParams(url.search);
-  if (
-    MPname.value !== '' ||
-    party.value !== '' ||
-    interest.value !== '' ||
-    constituency.value !== ''
-  ) {
-    send = true;
+
+  // user clicks Search button
+  if (pageLoad) {
+    if (
+      MPname.value !== '' ||
+      party.value !== '' ||
+      interest.value !== '' ||
+      constituency.value !== ''
+    ) {
+      send = true;
+    }
+    var params = {
+      MPname: MPname.value,
+      party: party.value,
+      constituency: constituency.value,
+      interest: interest.value,
+    };
+    // If some param in URL (user copy/pasted url with param), send request with data from URL.
+    // (only on page load cause !pageLoad)
+  } else {
+    if (
+      url.get('MPname') !== null ||
+      url.get('party') !== null ||
+      url.get('constituency') !== null ||
+      url.get('interest') !== null
+    ) {
+      send = true;
+    }
+    var params = {
+      MPname: url.get('MPname'),
+      party: url.get('party'),
+      constituency: url.get('constituency'),
+      interest: url.get('interest'),
+    };
   }
 
-  let params = {
-    MPname: MPname.value,
-    party: party.value,
-    constituency: constituency.value,
-    interest: interest.value,
-  };
+  // Set string variable with currently used parameters to compare it with last request.
+  let currentParams =
+    params.MPname + params.party + params.constituency + params.interest;
 
-  // if any parameter set (send === true) => send request
-  if (send === true) {
+  // If some parameter is set (send === true), and parameters
+  // are different than in last request, send request.
+  // (avoid needless requests)
+  if (send === true && currentParams !== lastParams) {
+    lastParams =
+      params.MPname + params.party + params.constituency + params.interest;
+    console.log('Request:');
+    console.log(params);
     const path = '';
-    const url = path + 'search.php';
+    const requestUrl = path + 'search.php';
     const opts = {
       headers: { Accept: 'application/json' },
       method: 'POST',
       body: JSON.stringify(params),
     };
-    const response = await fetch(url, opts);
+    const response = await fetch(requestUrl, opts);
     let data = await response.json();
+    console.log('Response:');
     console.log(data);
 
-    // set url parameters based on PHP's response
-    // slice() to remove '&' from end of url
+    // Set URL parameters based on PHP's response.
+    // Slice() to remove '&' from end of URL.
     let urlParam = data.urlParameters;
     window.history.pushState({ path: urlParam }, '', urlParam.slice(0, -1));
 
+    // Fill fields in the serach bar based on PHP's response (only validated parameters).
+    // If parameter is not sent back, it means that it didn't get thourgh validation.
+    // When user pastes URL with params, do the same - set respective fields based on response.
+    //
+    // Can't take data directly from URL cause it's huge
+    // security issue, so instead will take it from PHP response
+    // which is validated, therefore more secure.
+    MPname.value = data.validParameters.MPname
+      ? data.validParameters.MPname
+      : '';
+    party.value = data.validParameters.party ? data.validParameters.party : '';
+    constituency.value = data.validParameters.constituency
+      ? data.validParameters.constituency
+      : '';
+    interest.value = data.validParameters.interest
+      ? data.validParameters.interest
+      : '';
+
     // display search results
+    // display used params/filter
     displaySearchResults(data);
     displayActiveFilters();
-
-    // if no filter is set and any param in URL, reset url and
-    // put all MPs (saved on page load) into results div
   } else if (
     send === false &&
     (url.has('MPname') ||
@@ -65,48 +124,83 @@ async function searchRequest() {
       url.has('constituency') ||
       url.has('interest'))
   ) {
+    // User click Search button, but no filters are set (all fields clear)
+    // and some param in URL => reset url and display all MPs (saved on page load).
     let urlParam = '';
+
+    // If single filter was set and user removed it, then tried to set the same
+    // filter again it wouldn't let it, cause lastParams and currentParams would be the same => don't send.
+    // Assigning '' (default value) to lastParams here, helps to avoid this unwanted behavior.
+    lastParams = '';
     window.history.pushState({ path: urlParam }, '', urlParam);
     browseResults.innerHTML = browseResultsInitial;
+
+    // timeout; otherwise, the opacity transition doesn't work
+    setTimeout(function () {
+      let MPs = browseResults.getElementsByTagName('a');
+      for (let i = 0; i < MPs.length; i++) {
+        MPs[i].style.opacity = 1;
+      }
+    }, 100);
     displayActiveFilters();
   }
 }
 
+// This function to be called by searchRequest();
+// Display results. If no results - display error message.
+//
+// (not sure if better appraoch is to createElement(a/div/b) then append or
+// simply store all HTML in variable and only change values,
+// like in the 'else' condition (browseResults.innerHTML))
+// (first approach looks cleaner, but second is much shorter)
 function displaySearchResults(data) {
-  if (data.details.length > 0) {
+  if (data.MPs.length > 0) {
     browseResults.innerHTML = '';
 
-    for (let i = 0; i < data.details.length; i++) {
+    for (let i = 0; i < data.MPs.length; i++) {
       // create 'a' element; link to MP details
       let a = document.createElement('a');
-      a.setAttribute('href', 'mp.php?mpID=' + data.details[i].id);
+      a.setAttribute('href', 'mp.php?mpID=' + data.MPs[i].id);
 
       // create 'div' element (child of 'a')
       let div = document.createElement('div');
       div.setAttribute('class', 'mpBrowse');
 
-      // create 'b' element (child of 'div'); MP name
+      // create 'b' element (child of 'div'); contains MP name
       let b = document.createElement('b');
-      b.innerText = data.details[i].firstname + ' ' + data.details[i].lastname;
+      b.innerText = data.MPs[i].firstname + ' ' + data.MPs[i].lastname;
 
       div.style.borderLeft =
-        '8px solid ' + data.details[i].principal_colour.replace(/\s/g, '');
+        '8px solid ' + data.MPs[i].principal_colour.replace(/\s/g, '');
 
       div.appendChild(b);
       a.appendChild(div);
       browseResults.appendChild(a);
     }
+    // If no results with current filters, display error message.
   } else {
     browseResults.innerHTML =
-      '<div style="font-size:1.3em;margin-top:1em;border-left: 8px solid #071c4a;"><div class="mpBrowse"><b>No search results. Change your filters please.</b></div></div>';
+      '<a style="width:100%"><div style="border-left: 8px solid #071c4a;"><div class="mpBrowse"><b>No search results. Change your filters please.</b></div></div></a>';
   }
+
+  // timeout; otherwise, the opacity transition doesn't work
+  setTimeout(function () {
+    let MPs = browseResults.getElementsByTagName('a');
+    for (let i = 0; i < MPs.length; i++) {
+      MPs[i].style.opacity = 1;
+    }
+  }, 50);
 }
 
+// These two functions below don't do any complicated/logical operations.
+// Check each filter (parameter) and behave accordingly.
+//
 function displayActiveFilters() {
   let url = new URL(window.location.href);
   url = new URLSearchParams(url.search);
   let anyFilterSet = false;
-  let filterBorder = 'border: 4px solid #071c4a;padding: 8px 8px 7px 6px;';
+  // let filterBorder = 'border: 4px solid #071c4a;padding: 8px 8px 7px 6px;';
+  let filterBorder = 'background-color:#c9d9ff;';
   if (url.has('MPname') || MPname.value.length > 0) {
     MPname.style = filterBorder;
     filterMP.style.display = 'inline-block';
@@ -145,8 +239,11 @@ function displayActiveFilters() {
   }
   if (anyFilterSet === false) {
     filterNone.style.display = 'inline-block';
+    browseText.innerText = 'All Huddland MPs:';
+    browseResults.innerHTML = browseResultsInitial;
   } else {
     filterNone.style.display = 'none';
+    browseText.innerText = 'MPs matching your filters:';
   }
 }
 
@@ -183,9 +280,7 @@ function closeFilters(event) {
 
 searchButton.addEventListener('click', searchRequest);
 filters.addEventListener('click', closeFilters);
-searchBar.addEventListener('click', function (event) {
-  if (event.target.classList.contains('partyOption')) {
-    console.log(event.target);
-    //  event.target.innerHTML =
-  }
-});
+
+// (false) - get data from URL rather than search/input fields
+// So, on page load, check if parameters in URL are set and behave accordingly.
+searchRequest(false);

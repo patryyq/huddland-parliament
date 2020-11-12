@@ -19,12 +19,6 @@ header('Content-type: text/html; charset=utf-8');
             <input type="email" name="email" placeholder="Email" value="<?php echo $user->email; ?>">
             <input type="text" name="password" placeholder="Password">
             <input type="submit" name="submit" value="Sign in">
-            <!-- <div style="border-top:1px solid #6379aa;width:50%;padding:20px 10px; margin-top:20px;text-align:left;box-sizing:border-box">
-                Don't have account?<br><a href="#">Sign up</a>
-            </div>
-            <div style="width:50%;padding:20px 10px;border-top:1px solid #6379aa; margin-top:20px;text-align:right;box-sizing:border-box">
-                Forgot password?<br><a href="#">Reset password</a>
-            </div> -->
         </form>
     </div>
 

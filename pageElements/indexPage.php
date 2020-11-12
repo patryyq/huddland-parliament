@@ -1,14 +1,14 @@
 <main class="flex" style="align-content: flex-start;">
     <div id="searchBar" class="flex">
-        <div class="inputWrapper"><label for="MPname">MP name</label>
+        <div class="inputWrapper"><label for="MPname">MP</label>
             <input type="text" autocomplete="off" name="MPname" id="MPname"></div>
-        <div class="inputWrapper"><label for="party">Party</label>
+        <div class="inputWrapper"><label for="party">party</label>
             <?php echo $parliament->displayPartiesList('', true); ?> </div>
-        <div class="inputWrapper"><label for="constituency">Constituency</label>
+        <div class="inputWrapper"><label for="constituency">constituency</label>
             <?php echo $parliament->displayConstituenciesList('', true); ?></div>
-        <div class="inputWrapper"><label for="interest">Interest</label>
+        <div class="inputWrapper"><label for="interest">interest</label>
             <?php echo $parliament->displayInterests('list'); ?></div>
-        <input type="submit" name="searchButton" id="searchButton" value="Search" style="width:25%;">
+        <input type="submit" name="searchButton" id="searchButton" value="Search">
     </div>
     <div id="filters">
         Filters:
@@ -28,8 +28,10 @@
             None
         </div>
     </div>
+    <div id="browseText">All Huddland MPs:</div>
     <div id="browseResults" class="browseResults">
-        <?php $parliament->displayMpList(); ?>
+        <?php
+        $parliament->displayMpList(); ?>
     </div>
 </main>
 <script src="js/search.js"></script>

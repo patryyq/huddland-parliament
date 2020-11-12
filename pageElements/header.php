@@ -1,16 +1,6 @@
 <?php
 header('Content-type: text/html; charset=utf-8');
 
-$headerCookie = $_COOKIE['header'] ?? 1;
-if ($headerCookie == 0) {
-    $topDesc = 'class="none"';
-    $button = 'class="hidden"';
-    $header = 'class="header headerSmall"';
-} else {
-    $topDesc = 'class="flex"';
-    $button = 'class="visible"';
-    $header = 'class="header"';
-}
 ?>
 <!DOCTYPE html>
 <html>
@@ -37,14 +27,16 @@ if ($headerCookie == 0) {
                     <div class="menuElement">Logout</div>
                 </a>
             </div>
+            <div id="menuBurger">Menu</div>
         </div>
     </nav>
     <header id="header">
-        <div <?php echo $header; ?>>
+        <div id="toggleHeader" class="header header-vis">
             <div class="headerText">
                 <h1>Huddland Parliament</h1>
-                <div id="topDesc" <?php echo $topDesc; ?>>The Huddland Parliament has two Houses that work on behalf of Huddland citizens to check and challenge the work of Government, make and shape effective laws, and debate/make decisions on the big issues of the day.</div>
+                <div id="topDesc" style="height:auto;opacity:1;transition:unset">The Huddland Parliament has two Houses that work on behalf of Huddland citizens to check and challenge the work of Government, make and shape effective laws, and debate/make decisions on the big issues of the day.</div>
             </div>
         </div>
+        <div id="xButton" class="visible"></div>
+        <script src='js/general.js'></script>
     </header>
-    <div id="xButton" <?php echo  $button; ?>></div>

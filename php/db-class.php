@@ -4,7 +4,11 @@
 class db
 {
     // db credentials
-    private $dbHost = 'localhost';
+    //
+    // Host: '127.0.0.1', instead of 'localhost', so I can be connectecd to VPN.
+    // Being VPN connected and using 'localhost' won't load the page. It might be a XAMPP thing, not sure about that.
+    // Need VPN to work with the free APIs - used so much data off them, that connection from my IP is slowed/blocked.
+    private $dbHost = '127.0.0.1';
     private $dbUser = 'root';
     private $dbPass = '';
     private $dbName = 'huddland-parliament';

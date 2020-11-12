@@ -152,7 +152,7 @@ class parliament
             foreach ($searchData as $key => $value) {
                 // foreach $value (in MP, party etc.) which is not false (some IDs found) AND 
                 // $key is not equal urlParamateres AND not equal validFields
-                if ($value && $key !== 'urlParameters' && $key !== 'validFields') {
+                if ($value && $key !== 'urlParameters' && $key !== 'validFields' && $key !== 'usedParams') {
                     // loop through all IDs and put them to array
                     foreach ($value as $values) {
                         array_push($allIDs, $values['id']);
@@ -173,7 +173,8 @@ class parliament
             // get details of all MPs who match the search criteria
             $details = $this->db->getMatchingSearchMP($IDmatchingAllCriteria);
             $result = new stdClass();
-            $result->details = $details;
+            $result->MPs = $details;
+            $result->validParameters = $searchData->usedParams;
             $result->urlParameters = $searchData->urlParameters;
             return $result;
         } else {
@@ -191,6 +192,7 @@ class parliament
         $validData->party = $validate->id($data->party, 'party') ? $data->party : false;
         $validData->interest = $validate->id($data->interest, 'interestSearch') ? $data->interest : false;
         $validData->constituency = $validate->id($data->constituency, 'constituency') ? $data->constituency : false;
+        $validData->usedParams = ['MPname' => $validData->MPname, 'party' => $validData->party, 'constituency' => $validData->constituency, 'interest' => $validData->interest];
         // create link based on validated fields 
         // and return alongside with search results (matching MP IDs)
         $numberValidField = 0;

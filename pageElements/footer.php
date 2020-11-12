@@ -9,7 +9,6 @@ source: https://stackoverflow.com/questions/6320113/how-to-prevent-form-resubmis
         window.history.replaceState(null, null, window.location.href);
     }
 </script>
-<script src='js/general.js'></script>
 </body>
 
 </html>

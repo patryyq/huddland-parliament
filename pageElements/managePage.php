@@ -13,7 +13,7 @@ $constituencyGET = isset($_GET['constituency']) ? true : false;
 <main>
     <div id="manage" class="wrapper">
         <h1>Add content to the page</h1>
-        <p style="padding: 0 1em; box-sizing:border-box;">
+        <p style="margin-bottom:2em;">
             <b><?php echo $user->name; ?></b>, as a admin, you can <b>add</b> content to the Huddland Parliament website.</p>
         <?php
         $parliament->displayMessage();
