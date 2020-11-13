@@ -1,6 +1,3 @@
-<?php
-
-?>
 <div id="constituencyTab" class="manageTitle">Constituency</div>
 <div class="manageContent">
     <div id="addConstituency" class="flex toggle-content">

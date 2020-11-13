@@ -8,18 +8,18 @@ class validate
     // 1 => add party  
     // 2 => add interest
     // 3 => add constituency
-    private $postIndexList = [
+    private $requiredPOSTindexesForAction = [
         ['firstname', 'lastname', 'dateOfBirth', 'constituency', 'party', 'interests'],
         ['partyName', 'dateOfFoundation', 'principalColour'],
         ['interestName'],
         ['constituencyRegion', 'electorate'],
     ];
 
-    // array with: $_POST[index] => validation function
-    private $fieldValidationMethod =
+    // array with: $_POST[index] => respective validation function
+    private $eachPOSTindexValidationMethod =
     [
-        'firstname' => 'word',
-        'lastname' => 'word',
+        'firstname' => 'singleWord',
+        'lastname' => 'singleWord',
         'dateOfBirth' => 'dateOfBirth',
         'constituency' => 'id',
         'interests' => 'interests',
@@ -27,28 +27,28 @@ class validate
         'email' => 'email',
         'partyName' => 'multipleWords',
         'principalColour' => 'matchColour',
-        'dateOfFoundation' => 'foundYear',
+        'dateOfFoundation' => 'foundationYear',
         'interestName' => 'multipleWords',
         'constituencyRegion' => 'multipleWords',
         'electorate' => 'electorate'
     ];
 
-    private $error = []; // store errors
-    private $message = []; // store messages
+    private $error = [];
+    private $message = [];
 
     // validate single word: firstname, lastname
     // 
     // length >= 3
     // only letters and '-
-    public function word($string, $field)
+    public function singleWord($value, $index)
     {
-        if (preg_match("/^[A-Za-z'-]{3,}$/", $string)) {
-            $_SESSION[$field] = $string;
-            return $string;
+        if (preg_match("/^[A-Za-z'-]{3,}$/", $value)) {
+            $_SESSION[$index] = $value;
+            return $value;
         } else {
-            if ($field == 'firstname') {
+            if ($index == 'firstname') {
                 return $this->error(0);
-            } else if ($field == 'lastname') {
+            } else if ($index == 'lastname') {
                 return $this->error(1);
             }
         }
@@ -56,7 +56,7 @@ class validate
 
     // validate electorate number
     // 
-    // value between 30000 and 200000
+    // number between 30000 and 200000
     // trim whitespace and ,.
     public function electorate($number)
     {
@@ -72,35 +72,27 @@ class validate
     // validate multiple words: region, interest, party
     //
     // each word length >= 2
-    // check if whole string longer than 2 - it will
-    // accept words like "of" or "as" but not on its own
-    //
+    // whole string > 2 
+    // (accept words like "of" or "as" but not on its own)
     // only letters and '-,
-    public function multipleWords($string, $field = false)
+    public function multipleWords($value, $index = false)
     {
-        // split string containing many words
-        // into array with separate words
-        $explode = explode(' ', $string);
+        $explode = explode(' ', $value);
         $result = true;
-        // if some of the words doesn't match preg_match
-        // set $result = false => function returns false;
+        // if any of the words doesn't match -> function returns false;
         foreach ($explode as $str) {
-            if (preg_match("/^[A-Za-z'-,]{2,}$/", $str)) {
-            } else {
-                $result = false;
-            }
+            if (!preg_match("/^[A-Za-z'-,]{2,}$/", $str)) $result = false;
         }
-        if ($result === true && strlen($string) > 2) {
-            if ($field) {
-                $_SESSION[$field] = $string;
-            }
-            return $string;
+
+        if ($result === true && strlen($value) > 2) {
+            if ($index) $_SESSION[$index] = $value;
+            return $value;
         } else {
-            if ($field == 'partyName') {
+            if ($index == 'partyName') {
                 return $this->error(2);
-            } else if ($field == 'interestName') {
+            } else if ($index == 'interestName') {
                 return $this->error(13);
-            } else if ($field == 'constituencyRegion') {
+            } else if ($index == 'constituencyRegion') {
                 return $this->error(15);
             }
         }
@@ -115,8 +107,9 @@ class validate
         $age = '';
         if (preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/', $dateOfBirth)) {
             $age = new parliament();
-            $age = intval($age->getAge($dateOfBirth));
+            $age = intval($age->calculateAge($dateOfBirth));
         }
+
         if ($age >= 18 && $age < 95) {
             $_SESSION['dateOfBirth'] = $dateOfBirth;
             return $dateOfBirth;
@@ -130,13 +123,14 @@ class validate
     // format YYYY
     // year not in future
     // not older than 200 years
-    public function foundYear($foundationYear)
+    public function foundationYear($foundationYear)
     {
 
         if (preg_match('/^[0-9]{4}$/', $foundationYear)) {
             $foundationYear = intval($foundationYear);
             $currentYear = intval(date('Y'));
             $diff = $currentYear - $foundationYear;
+
             if ($diff  < 0) {
                 return $this->error(10);
             } else if ($diff  >= 0 && $diff < 200) {
@@ -174,14 +168,14 @@ class validate
         $db = new db();
         $fieldName = $table;
         $table == 'party' ? $table = $db->getAllParties() : ($table == 'mp' ? $table = $db->getAllMp() : ($table == 'constituency' ? $table = $db->getAllConstituencies() : ($table == 'interestSearch' ? $table = $db->getAllInterests() : false)));
+
         $result = false;
         if (is_numeric($id)) {
             foreach ($table as $row) {
-                if ($row['id'] == $id) {
-                    $result = $id;
-                }
+                if ($row['id'] == $id) $result = $id;
             }
         }
+
         if ($result) {
             $_SESSION[$fieldName] = $result;
             return $result;
@@ -198,8 +192,8 @@ class validate
 
     // validate interest IDs
     // 
-    // exists in interests table
     // each POSTed interest ID is unique
+    // and exists in interests table
     // (both to prevent manipulated data)
     public function interests($ids)
     {
@@ -207,23 +201,23 @@ class validate
             $db = new db();
             $interests = $db->getAllInterests();
             $result = true;
-            $acceptedIds = [];
+            $validIDs = [];
+
             foreach ($ids as $postID) {
                 $resultTemp = false;
                 foreach ($interests as $dbID) {
-                    // if POSTED id exists in DB and is not duplicated
-                    if ($postID == $dbID['id'] && !in_array($postID, $acceptedIds) && is_numeric($postID)) {
+                    // if POSTed ID exists in DB and is not duplicated
+                    if ($postID == $dbID['id'] && !in_array($postID, $validIDs) && is_numeric($postID)) {
+                        array_push($validIDs, $postID);
                         $resultTemp = true;
-                        // add valid ID to temp array
-                        array_push($acceptedIds, $postID);
                     }
                 }
-                // $resultTemp === false; means, either duplicated or not exist in DB
-                // so set $result to false; else do nothing
+                // $resultTemp === false; means, either the ID is duplicated or not exist in DB -> set $result to false
                 $resultTemp == true ? true : $result = false;
             }
-            $_SESSION['interests'] = $acceptedIds;
-            return ($result && count($ids) == count($acceptedIds) ? $ids : $this->error(6));
+
+            $_SESSION['interests'] = $validIDs;
+            return ($result && count($ids) == count($validIDs) ? $ids : $this->error(6));
         } else {
             return $this->error(6);
         }
@@ -231,22 +225,19 @@ class validate
 
     // validate principal colour
     //
-    // check if given colour exists in
-    // the colours array (148 colours) 
-    public function matchColour($givenColour)
+    // check if given colour exists in the principal colours array (148 CSS colour names) 
+    public function matchColour($principalColour)
     {
         $colours = new parliament();
-        if (array_key_exists(preg_replace('/\s+/', '', $givenColour), $colours->principleColoursList)) {
-            $_SESSION['principalColour'] = $givenColour;
-            return $givenColour;
+        if (array_key_exists(preg_replace('/\s+/', '', $principalColour), $colours->principalColoursList)) {
+            $_SESSION['principalColour'] = $principalColour;
+            return $principalColour;
         } else {
             return $this->error(12);
         }
     }
 
-    // get all post data
-    //
-    // isset($_POST['index']) ? (add to $post array) : false;
+    // get POST data
     private function rawPostData()
     {
         $post = [];
@@ -265,59 +256,50 @@ class validate
         return $post;
     }
 
-    // main validation function to be called by 'add to db' functions
+    // main validation function called by 'ADD to DB' functions
     //
-    // checks if all needed fields for specific action are filled 
-    // and meet the validation rules
-    //
-    // action: 0 => addMP, 1 => addPARTY, 2 => addCONST, 3 => addINT
-    public function validatedPostData($action)
+    // check if all needed fields for specific action are filled and passed validation
+    public function validatePostData($action)
     {
-        $postDATA = $this->rawPostData();
+        $rawPostData = $this->rawPostData();
+        $keysArray = $this->requiredPOSTindexesForAction[$action];
         $result = true;
-        // $this->postIndexList - the list with needed $_POST indexes
-        $keysArray = $this->postIndexList[$action];
 
-        foreach ($keysArray as $key) {
-            if (!array_key_exists($key, $postDATA) || !$this->validateField($key, $postDATA[$key])) {
-                $result = false;
-            }
+        foreach ($keysArray as $index) {
+            if (!array_key_exists($index, $rawPostData) || !$this->validateField($index, $rawPostData[$index])) $result = false;
         }
-        return $result ? $postDATA : false;
+
+        return $result ? $rawPostData : false;
     }
 
     // function to be called by the above "main validation" function
     //
-    // it checks the $_POST index of given data (field)
-    // and validates it against specific validation function
-    // which is in the array $fieldValidationMethod 
-    // ($key => $value; key - POST index; $value - validation function)
-    public function validateField($key, $field)
+    // validate $value against a specific validation function
+    public function validateField($index, $value)
     {
-        $validationMethod = $this->fieldValidationMethod;
-        switch ($validationMethod[$key]) {
-            case 'word':
-                return $this->word($field, $key);
+        $validationMethod = $this->eachPOSTindexValidationMethod;
+        switch ($validationMethod[$index]) {
+            case 'singleWord':
+                return $this->singleWord($value, $index);
             case 'id':
-                return $this->id($field, $key);
+                return $this->id($value, $index);
             case 'dateOfBirth':
-                return $this->dateOfBirth($field);
+                return $this->dateOfBirth($value);
             case 'interests':
-                return $this->interests($field);
+                return $this->interests($value);
             case 'email':
-                return $this->email($field);
+                return $this->email($value);
             case 'multipleWords':
-                return $this->multipleWords($field, $key);
-            case 'foundYear':
-                return $this->foundYear($field);
+                return $this->multipleWords($value, $index);
+            case 'foundationYear':
+                return $this->foundationYear($value);
             case 'matchColour':
-                return $this->matchColour($field);
+                return $this->matchColour($value);
             case 'electorate':
-                return $this->electorate($field);
+                return $this->electorate($value);
         }
     }
 
-    // function to set errors
     private function error($errorIndex)
     {
         $errorMessages = [
@@ -344,7 +326,6 @@ class validate
         return false;
     }
 
-    // function to set messages
     public function message($messageIndex)
     {
         $confirmationMessages = [
@@ -372,5 +353,31 @@ class validate
         array_push($this->message, $confirmationMessages[$messageIndex]);
         $_SESSION['confirmationMessage'] = $this->message;
         return true;
+    }
+
+    // Function to safely use untrusted data - XSS protection.
+    // 
+    // I could be naive, but it seems that in case
+    // of this website, I don't need to use htmlentities().
+    // All data must pass validation functions first and only 
+    // letters, numbers and -', are allowed. Followed the idea of 
+    // 'whitelisting', which seems to be sufficient. 
+    // (email is not displayed on the page so it doesn't count)
+    //
+    // I think the only way to break it, is to put a malicious code into DB 
+    // manually, but then I have a bigger problem than encoding...
+    //
+    // It is absolutely necessary, if characters like '&' or '#' are allowed. 
+    // I think, nothing could go wrong with only letters, numbers and -',.
+    // 
+    // Tried to google this topic for a while, but didn't find a precise answer. 
+    // Everyone says, it is a must. Then prove it with few examples with use of
+    // the '&#0000106', '&#106;' or any other weird encoding stuff. None of them
+    // mention the case where these characters are not allowed.
+    //
+    // Got this function ready, in case I realised that I need it.
+    function entitiedData($value)
+    {
+        return htmlentities($value, ENT_QUOTES, 'UTF-8');
     }
 }

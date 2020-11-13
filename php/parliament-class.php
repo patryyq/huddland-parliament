@@ -2,21 +2,16 @@
 
 class parliament
 {
-    public $error = [];
 
     function __construct()
     {
         $this->mpID = isset($_GET['mpID']) && is_numeric($_GET['mpID']) ? $_GET['mpID'] : false;
-        // // is_numeric($_GET['partyID']) === true; should be enough 
-        // $this->partyID = isset($_GET['partyID']) && is_numeric($_GET['partyID']) ? $_GET['partyID'] : false;
         $this->db = new db();
     }
 
-    // get all details of single MP
-    public function getMpDetails()
+    public function getSingleMpDetails()
     {
-        // used GROUP_CONCAT to gather all interests as single string
-        // rather than having duplicated results/rows with only different interest
+        // GROUP_CONCAT to gather all interests as a single string
         $query =
             "SELECT members.id, members.firstname, members.party_id, members.lastname, members.date_of_birth, 
             parties.name, parties.date_of_foundation, parties.principal_colour, constituencies.region, 
@@ -31,15 +26,11 @@ class parliament
             WHERE members.id = ?";
         $param = [$this->mpID];
         $mp = $this->db->selectQuery($query, $param);
-        if ($mp[0]['firstname'] != NULL) {
-            return $mp;
-        } else {
-            return false;
-        }
+        return ($mp[0]['firstname'] !== null) ? $mp : false;
     }
 
-    // calculate age, from format YYYY-MM-DD
-    public function getAge($dateOfBirth)
+    // from format YYYY-MM-DD
+    public function calculateAge($dateOfBirth)
     {
         $currentYear = date('Y');
         $currentMonth = date('m');
@@ -48,19 +39,14 @@ class parliament
         $mpMonth = substr($dateOfBirth, 5, 2);
         $mpDay = substr($dateOfBirth, 8, 2);
 
-        // had birthday this year already?
+        // had birthday this year?
         // has birthday today? 
         $age = $currentYear - $mpYear - 1;
-        if (($currentMonth > $mpMonth) ||
-            ($currentMonth == $mpMonth && $currentDay >= $mpDay)
-        ) {
-            $age = $age + 1;
-        }
+        if (($currentMonth > $mpMonth) || ($currentMonth == $mpMonth && $currentDay >= $mpDay)) $age = $age + 1;
         return $age;
     }
 
-    // display links to MP details
-    public function displayMpList()
+    public function renderMpList()
     {
         if ($mps = $this->db->getAllMp()) {
             foreach ($mps as $mp) {
@@ -75,18 +61,17 @@ class parliament
         }
     }
 
-    // generate dropdown menu with parties
-    public function displayPartiesList($topMessage, $selected = false)
+    public function renderPartiesList($valueFromSession = false)
     {
         if ($parties = $this->db->getAllParties()) {
-            $selectStart = '<select id="party" name="party"><option value="">' . $topMessage . '</option>';
+            $selectStart = '<select id="party" name="party"><option value=""></option>';
             $selectEnd = '</select>';
             $options = '';
             foreach ($parties as $party) {
-                if (isset($_SESSION['party']) && $_SESSION['party'] == $party['id'] && $selected === false) {
+                if (isset($_SESSION['party']) && $_SESSION['party'] == $party['id'] && $valueFromSession === 'valueFromSession') {
                     $options .= '<option selected value="' . $party['id'] . '">' . $party['name'] . '</option>';
                 } else {
-                    $options .= '<option class="partyOption" value="' . $party['id'] . '">' . $party['name'] . '</option>';
+                    $options .= '<option value="' . $party['id'] . '">' . $party['name'] . '</option>';
                 }
             }
             return $selectStart . $options . $selectEnd;
@@ -95,18 +80,17 @@ class parliament
         }
     }
 
-    // generate dropdown menu with contituencies
-    public function displayConstituenciesList($topMessage, $selected = false)
+    public function renderConstituenciesList($valueFromSession = false)
     {
         if ($constituencies = $this->db->getAllConstituencies()) {
-            $selectStart = '<select id="constituency" name="constituency"><option value="">' . $topMessage . '</option>';
+            $selectStart = '<select id="constituency" name="constituency"><option value=""></option>';
             $selectEnd = '</select>';
             $options = '';
             foreach ($constituencies as $constituency) {
-                if (isset($_SESSION['constituency']) && $_SESSION['constituency'] == $constituency['id'] && $selected === false) {
+                if (isset($_SESSION['constituency']) && $_SESSION['constituency'] == $constituency['id'] && $valueFromSession === 'valueFromSession') {
                     $options .= '<option selected value="' . $constituency['id'] . '">' . $constituency['region'] . '</option>';
                 } else {
-                    $options .= '<option class="constituencyOption" value="' . $constituency['id'] . '">' . $constituency['region'] . '</option>';
+                    $options .= '<option value="' . $constituency['id'] . '">' . $constituency['region'] . '</option>';
                 }
             }
             return $selectStart . $options . $selectEnd;
@@ -115,8 +99,7 @@ class parliament
         }
     }
 
-    // generate checkboxes with interests
-    public function displayInterests($type)
+    public function renderInterests($type)
     {
         $interests = $this->db->getAllInterests();
         $input = '';
@@ -133,51 +116,48 @@ class parliament
             $selectEnd = '</select>';
             $input = '';
             foreach ($interests as $interest) {
-                $input .= '<option class="interestOption" value="' . $interest['id'] . '">' . $interest['name'] . '</option>';
+                $input .= '<option value="' . $interest['id'] . '">' . $interest['name'] . '</option>';
             }
             $input = $selectStart . $input . $selectEnd;
         }
         return $input;
     }
 
+    public function renderColoursDropdown()
+    {
+        foreach ($this->principalColoursList as $key => $value) {
+            echo '<option class="colourOption">' . $value . '</option>';
+        }
+    }
+
     public function search($encodedData)
     {
-        // check if given data has valid JSON structure 
-        // (avoid simple JS/JSON manipulation)
         if ($this->isJSON($encodedData)) {
+            $searchData = $this->validateAndSearch($encodedData);
+            $gatherAllIDs = [];
 
-            $searchData = $this->validateAndSearch($encodedData); // $searchData holds all matching IDs
-            $numberOfValidFields = $searchData->validFields;
-            $allIDs = []; // array to hold all IDs
             foreach ($searchData as $key => $value) {
-                // foreach $value (in MP, party etc.) which is not false (some IDs found) AND 
-                // $key is not equal urlParamateres AND not equal validFields
-                if ($value && $key !== 'urlParameters' && $key !== 'validFields' && $key !== 'usedParams') {
-                    // loop through all IDs and put them to array
-                    foreach ($value as $values) {
-                        array_push($allIDs, $values['id']);
+                if ($value && $key !== 'urlParameters' && $key !== 'numberOfValidFields' && $key !== 'usedParams') {
+                    foreach ($value as $val) {
+                        array_push($gatherAllIDs, $val['id']);
                     }
                 }
             }
-            // count occurrence of each MP ID
-            $allIDs = array_count_values($allIDs);
-            // array to hold all MP IDs which occur as many times as filters are set
-            $IDmatchingAllCriteria = [];
 
-            // if count of MP ID equals 'numberOfValidFields' -> given MP ID meets all search criteria
-            foreach ($allIDs as $k => $v) {
-                if ($v === $numberOfValidFields) {
-                    array_push($IDmatchingAllCriteria, $k);
-                }
+            // if count of MP ID equals 'numberOfValidFields' -> given MP's ID meets all search criteria
+            $countOfEachID = array_count_values($gatherAllIDs);
+            $IDmatchingAllCriteria = [];
+            $numberOfValidFields = $searchData->numberOfValidFields;
+
+            foreach ($countOfEachID as $ID => $count) {
+                if ($count === $numberOfValidFields) array_push($IDmatchingAllCriteria, $ID);
             }
 
-            // get details of all MPs who match the search criteria
-            $details = $this->db->getMatchingSearchMP($IDmatchingAllCriteria);
-            $result = new stdClass();
-            $result->MPs = $details;
-            $result->validParameters = $searchData->usedParams;
-            $result->urlParameters = $searchData->urlParameters;
-            return $result;
+            $responseToJS = new stdClass();
+            $responseToJS->MPs = $this->db->getMatchingSearchMP($IDmatchingAllCriteria);
+            $responseToJS->validParameters = $searchData->usedParams;
+            $responseToJS->urlParameters = $searchData->urlParameters;
+            return $responseToJS;
         } else {
             return false;
         }
@@ -185,17 +165,17 @@ class parliament
 
     private function validateAndSearch($encodedData)
     {
-        // validate all POST data from JS
         $data = json_decode($encodedData);
         $validate = new validate();
         $validData = new stdClass();
+
         $validData->MPname = $validate->multipleWords($data->MPname) ? $data->MPname : false;
         $validData->party = $validate->id($data->party, 'party') ? $data->party : false;
         $validData->interest = $validate->id($data->interest, 'interestSearch') ? $data->interest : false;
         $validData->constituency = $validate->id($data->constituency, 'constituency') ? $data->constituency : false;
         $validData->usedParams = ['MPname' => $validData->MPname, 'party' => $validData->party, 'constituency' => $validData->constituency, 'interest' => $validData->interest];
-        // create link based on validated fields 
-        // and return alongside with search results (matching MP IDs)
+
+        // url based on valid fields
         $numberValidField = 0;
         $url = '?';
         if ($validData->MPname) {
@@ -218,24 +198,21 @@ class parliament
             $validData->interest = $this->db->searchMpInterestID($validData->interest);
             $numberValidField++;
         }
+
+        // number of MP's IDs === number of valid fields ? given ID meets all search criteria;
+        $validData->numberOfValidFields = $numberValidField;
         $validData->urlParameters = $url;
-        // number of valid fields to compare with number of same MP IDs
-        // if number of same MP IDs === number of fields
-        // means that the MP ID meets all search criteria
-        $validData->validFields = $numberValidField;
         return $validData;
     }
 
-    private function isJSON($string)
+    private function isJSON($encodedDataFromJS)
     {
-        json_decode($string);
+        json_decode($encodedDataFromJS);
         return (json_last_error() == JSON_ERROR_NONE);
     }
 
-    // function called after ADD functions (MP/party/interest/constituency)
-    // to destroy $_SESSION values which are used to populate form data
-    // so, after a record is added to DB, the form is empty
-    public function unsetSession()
+    // these $_SESSIONs are used to populate input fields
+    public function unsetInputFieldSessions()
     {
         unset($_SESSION['firstname']);
         unset($_SESSION['lastname']);
@@ -251,11 +228,6 @@ class parliament
         unset($_SESSION['constituencyRegion']);
     }
 
-    // display confirmation messages
-    // 0 => add MP
-    // 1 => add party
-    // 2 => add interest
-    // 3 => add constituency
     public function displayMessage()
     {
         if (isset($_SESSION['confirmationMessage'])) {
@@ -272,7 +244,6 @@ class parliament
         }
     }
 
-    // display error messages
     public function displayError()
     {
         if (isset($_SESSION['errorMessage'])) {
@@ -284,22 +255,14 @@ class parliament
         }
     }
 
-    // generate options for principal colours select field
-    public function coloursDropdown()
-    {
-        foreach ($this->principleColoursList as $key => $value) {
-            echo '<option class="colourOption">' . $value . '</option>';
-        }
-    }
-
-    // list of all (if not, then at least most) CSS colour names
+    // list of all/most CSS colour names
     //
     // scraped the data/colours with simple JS program
     // source: http://www.colors.commutercreative.com/grid/
     //
     // 1) used in process of generating the colours select field
     // 2) used in colour validation process
-    public $principleColoursList = [
+    public $principalColoursList = [
         'aliceblue' => 'alice blue',
         'antiquewhite' => 'antique white',
         'aqua' => 'aqua',

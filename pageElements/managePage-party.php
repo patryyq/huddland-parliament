@@ -1,6 +1,3 @@
-<?php
-
-?>
 <div id="parties" class="manageTitle">Party</div>
 <div class="manageContent">
     <div id="addParty" class="flex toggle-content">
@@ -19,7 +16,7 @@
                 <input id="principalColour" autocomplete="off" type="text" name="principalColour" value="<?php echo $_SESSION['principalColour'] ?? false; ?>" style="margin-bottom:0;">
                 <select id="colours" multiple style="display:none" size="7">
                     <?php
-                    $parliament->coloursDropdown(); ?>
+                    $parliament->renderColoursDropdown(); ?>
                 </select>
             </div>
             <p style="margin-top: 3em;">Do you want to add a new <b>party</b>?</p>

@@ -1,22 +1,17 @@
 <?php
-// This file is used to render HTML content for "mp.php" page
-//
-//
-//
 // variables to hold all MP details
-$mpDetails = $parliament->getMpDetails()[0];
-if ($mpDetails['firstname'] == false) {
-    header('Location: ' . APPLOCATION);
-}
+$mpDetails = $parliament->getSingleMpDetails()[0];
+if ($mpDetails['firstname'] == false) header('Location: ' . APPLOCATION);
+
 $firstName = $mpDetails['firstname'];
 $lastName = $mpDetails['lastname'];
 $dateOfBirth = $mpDetails['date_of_birth'];
 $partyName = $mpDetails['name'];
 $dateOfFoundation = $mpDetails['date_of_foundation'];
-$colour =  str_replace(' ', '', $mpDetails['principal_colour']); // remove spaces in colour names
+$colour =  str_replace(' ', '', $mpDetails['principal_colour']); // colours in db are kept with spaces
 $region =  $mpDetails['region'];
 $electorate =  $mpDetails['electorate'];
-$age = $parliament->getAge($dateOfBirth);
+$age = $parliament->calculateAge($dateOfBirth);
 $formatedDoB = date_format(date_create($dateOfBirth), 'd/m/Y');
 $interests = $mpDetails['interests'];
 ?>

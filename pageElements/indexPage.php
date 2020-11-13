@@ -1,13 +1,15 @@
 <?php
-
 // If cookie 'filters' is set to 0 and no parameters in URL,
-// set transition:none to searchBar, so could be hidden instantly - 
-// rather than after 350ms. It only improves a 'feel' of the page.
-if (isset($_COOKIE['filters']) && $_COOKIE['filters'] == 0 && !isset($_GET['MPname']) && !isset($_GET['interest']) && !isset($_GET['party']) && !isset($_GET['constituency'])) {
-    $transition = 'transition:none';
-} else {
+// set transition:none in searchBar, so it hide instantly - 
+// rather than after 350ms. It improves a 'feel' of the page.
+(isset($_COOKIE['filters']) &&
+    $_COOKIE['filters'] == 0 &&
+    !isset($_GET['MPname']) &&
+    !isset($_GET['interest']) &&
+    !isset($_GET['party']) &&
+    !isset($_GET['constituency'])) ?
+    $transition = 'transition:none' :
     $transition = '';
-}
 ?>
 <main class="flex" style="align-content: flex-start;">
     <div id="searchBar" class="flex">
@@ -18,11 +20,11 @@ if (isset($_COOKIE['filters']) && $_COOKIE['filters'] == 0 && !isset($_GET['MPna
             <div class="inputWrapper"><label for="MPname">MP</label>
                 <input type="text" autocomplete="off" name="MPname" id="MPname"></div>
             <div class="inputWrapper"><label for="party">party</label>
-                <?php echo $parliament->displayPartiesList('', true); ?> </div>
+                <?php echo $parliament->renderPartiesList(); ?> </div>
             <div class="inputWrapper"><label for="constituency">constituency</label>
-                <?php echo $parliament->displayConstituenciesList('', true); ?></div>
+                <?php echo $parliament->renderConstituenciesList(); ?></div>
             <div class="inputWrapper"><label for="interest">interest</label>
-                <?php echo $parliament->displayInterests('list'); ?></div>
+                <?php echo $parliament->renderInterests('list'); ?></div>
             <input type="submit" name="searchButton" id="searchButton" value="Search">
         </div>
     </div>
@@ -47,7 +49,7 @@ if (isset($_COOKIE['filters']) && $_COOKIE['filters'] == 0 && !isset($_GET['MPna
     <div id="browseText">Huddland Parliament MPs:</div>
     <div id="browseResults" class="browseResults">
         <?php
-        $parliament->displayMpList(); ?>
+        $parliament->renderMpList(); ?>
     </div>
 </main>
 <script src="js/search.js"></script>

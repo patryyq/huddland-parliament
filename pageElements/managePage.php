@@ -1,9 +1,5 @@
 <?php
-// This file is used to render HTML content for "manage.php" page
-//
-//
-// could use '$_GET ?? false' synthax but in my case it returns false cause value is empty
-// isset() returns true even if the value is empty
+// If any of these $_GETs is set -> display error/confirmation.
 $mpGET = isset($_GET['mp']) ? true : false;
 $partyGET = isset($_GET['party']) ? true : false;
 $interestsGET = isset($_GET['interest']) ? true : false;
@@ -44,4 +40,4 @@ $constituencyGET = isset($_GET['constituency']) ? true : false;
 </main>
 <script src="js/manage.js"></script>
 <?php
-$parliament->unsetSession();
+$parliament->unsetInputFieldSessions();

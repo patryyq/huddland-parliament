@@ -1,6 +1,3 @@
-<?php
-
-?>
 <div id="mp" class="manageTitle">MP</div>
 <div class="manageContent">
     <div id="addMp" class="flex toggle-content">
@@ -18,12 +15,12 @@
                 <label for="dateOfBirth">date of birth</label>
                 <input type="date" name="dateOfBirth" value="<?php echo $_SESSION['dateOfBirth'] ?? false; ?>"></div>
             <div class="inputWrapper"><label for="party">party</label>
-                <?php echo $parliament->displayPartiesList(''); ?> </div>
+                <?php echo $parliament->renderPartiesList('valueFromSession'); ?> </div>
             <div class="inputWrapper"><label for="constituency">constituency</label>
-                <?php echo $parliament->displayConstituenciesList(''); ?></div>
+                <?php echo $parliament->renderConstituenciesList('valueFromSession'); ?></div>
             <p>Interests:</p>
             <div style="width:100%" id="interestsBoxes" class="flex">
-                <?php echo $parliament->displayInterests('checkbox'); ?>
+                <?php echo $parliament->renderInterests('checkbox'); ?>
             </div>
             <p style="margin-top: 3em;">Do you want to add a new <b>MP</b>?</p>
             <div class="inputWrapper"> <input type="submit" name="addMpButton" value="Add MP"></div>

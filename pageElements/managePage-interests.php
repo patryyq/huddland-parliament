@@ -1,6 +1,3 @@
-<?php
-
-?>
 <div id="interests" class="manageTitle">Interest</div>
 <div class="manageContent">
     <div id="addInterest" class="flex toggle-content">

@@ -1,6 +1,5 @@
 <?php
 include('php/config.php');
-
 $user = new user();
 
 if ($user->isLoggedIn()) {

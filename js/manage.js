@@ -145,13 +145,13 @@ searchColour = function () {
   }
   if (count === 0) {
     select.style.display = 'none';
-  } else if (count < 10) {
+  } else if (count < 7) {
     select.style.display = 'block';
     select.setAttribute('size', count);
     select.style.overflow = 'hidden';
   } else {
     select.style.display = 'block';
-    select.setAttribute('size', 10);
+    select.setAttribute('size', 7);
     select.style.overflow = 'auto';
   }
 };

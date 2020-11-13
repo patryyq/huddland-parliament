@@ -22,23 +22,22 @@
 //
 //
 // All APIs work and talk to each other nicely. The only issue is
-// that PROXY has requests limit (not sure how much, but around couple hundred per hour),
+// that PROXY has requests limit (couple hundred per hour),
 // also GENDER API has limit of 500 requests a month (if it runs out and get error
 // (gender=unknown), feed random face with no gender).
-// I use VPN to avoid PROXY limits. Also commented getGender() for now to not use their limits.
-// >>>Wanna use Gender API? Just replace line 85<<<
+// Used VPN to avoid PROXY limits. Also commented getGender() for now to not use their limits.
+// To use Gender API, replace line 85.
 //
 //
 // The random face generation process takes 2-30sec.
 // I think, the biggest factor in speed is the PROXY (which is needed only for local development).
 // Response from Face Generator is lightspeed but the PROXY tends to be really slow.
 //
-// JSON responses from gender, random face and quote APIs stored in arrays
+//
 let gender = [];
 let randomFace = [];
 let quoteContent = [];
 
-// CORS PROXY
 const APIproxy = 'https://cors-anywhere.herokuapp.com/';
 
 // Get and display random quote.
@@ -67,9 +66,8 @@ async function getGender() {
     'https://gender-api.com/get?name=' +
     name +
     '&key=oNrWDverHQkAtDXMDW';
-  const opts = { headers: { Accept: 'application/json' } };
   try {
-    const response = await fetch(url, opts);
+    const response = await fetch(url);
     const data = await response.json();
     console.log(url);
     gender = [data];
@@ -79,14 +77,13 @@ async function getGender() {
   return true;
 }
 
-// Call gender function, then use gender response and MP's
-// age from DOM as parameters for random face API request.
+// Random Face is based on age and gender.
 async function getRandomFace() {
   gender = [{ gender: 'unknown' }]; // await getGender(); // replace the line to get gender
-  faceGender = gender[0].gender == 'unknown' ? '' : gender[0].gender;
-  const age = document.getElementById('age').innerText;
-  const minAge = age > 20 ? parseInt(age) - 2 : age;
-  const maxAge = parseInt(age) + 2;
+  gender = gender[0].gender == 'unknown' ? '' : gender[0].gender;
+  const age = parseInt(document.getElementById('age').innerText);
+  const minAge = age > 20 ? age - 2 : age;
+  const maxAge = age + 2;
   const url =
     APIproxy +
     'https://fakeface.rest/face/json?minimum_age=' +
@@ -94,10 +91,9 @@ async function getRandomFace() {
     '&maximum_age=' +
     maxAge +
     '&gender=' +
-    faceGender;
-  const opts = { headers: { Accept: 'application/json' } };
+    gender;
   try {
-    const response = await fetch(url, opts);
+    const response = await fetch(url);
     const data = await response.json();
     randomFace = [data];
   } catch (e) {
@@ -106,7 +102,6 @@ async function getRandomFace() {
   return true;
 }
 
-// display random face on page
 async function displayRandomFace() {
   await getRandomFace();
   let img = document.createElement('img');
