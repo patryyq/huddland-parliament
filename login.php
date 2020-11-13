@@ -2,7 +2,6 @@
 include('php/config.php');
 
 $user = new user();
-$parliament = new parliament();
 
 if ($user->isLoggedIn()) {
     header('Location: ' . APPLOCATION);

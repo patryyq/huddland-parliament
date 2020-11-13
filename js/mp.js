@@ -26,7 +26,7 @@
 // also GENDER API has limit of 500 requests a month (if it runs out and get error
 // (gender=unknown), feed random face with no gender).
 // I use VPN to avoid PROXY limits. Also commented getGender() for now to not use their limits.
-// >>>Wanna use Gender API? Just replace line 86<<<
+// >>>Wanna use Gender API? Just replace line 85<<<
 //
 //
 // The random face generation process takes 2-30sec.

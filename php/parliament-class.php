@@ -50,7 +50,7 @@ class parliament
 
         // had birthday this year already?
         // has birthday today? 
-        $age = ($currentYear - $mpYear) - 1;
+        $age = $currentYear - $mpYear - 1;
         if (($currentMonth > $mpMonth) ||
             ($currentMonth == $mpMonth && $currentDay >= $mpDay)
         ) {
@@ -68,7 +68,7 @@ class parliament
                 $lastname = $mp['lastname'];
                 $colour = str_replace(' ', '', $mp['principal_colour']);
                 $border = 'border-left:8px solid ' . $colour;
-                echo '<a href="mp.php?mpID=' . $mp['id'] . '"><div class="mpBrowse" style="' . $border . '"><b>' . $firstname . ' ' . $lastname . '</b>, <span style="font-size:0.9em;color:#494949">' . $mp['name'] . '</span></div></a>';
+                echo '<a href="mp.php?mpID=' . $mp['id'] . '"><div class="mpBrowse" style="' . $border . '"><b>' . $firstname . ' ' . $lastname . '</b>, <span class="partyName">' . $mp['name'] . '</span></div></a>';
             }
         } else {
             return false;
@@ -146,7 +146,7 @@ class parliament
         // (avoid simple JS/JSON manipulation)
         if ($this->isJSON($encodedData)) {
 
-            $searchData = $this->validateAndSearch($encodedData); // $searchData hold all matching IDs
+            $searchData = $this->validateAndSearch($encodedData); // $searchData holds all matching IDs
             $numberOfValidFields = $searchData->validFields;
             $allIDs = []; // array to hold all IDs
             foreach ($searchData as $key => $value) {
@@ -161,7 +161,8 @@ class parliament
             }
             // count occurrence of each MP ID
             $allIDs = array_count_values($allIDs);
-            $IDmatchingAllCriteria = []; // array to hold all MP IDs which meet search criteria
+            // array to hold all MP IDs which occur as many times as filters are set
+            $IDmatchingAllCriteria = [];
 
             // if count of MP ID equals 'numberOfValidFields' -> given MP ID meets all search criteria
             foreach ($allIDs as $k => $v) {
@@ -291,7 +292,7 @@ class parliament
         }
     }
 
-    // list of all (if not, then at least most) css colour names
+    // list of all (if not, then at least most) CSS colour names
     //
     // scraped the data/colours with simple JS program
     // source: http://www.colors.commutercreative.com/grid/

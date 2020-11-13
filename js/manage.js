@@ -1,8 +1,6 @@
-// if user has selected one of the optionsl on refresh keep that tab open
+// Open specific tab on form submit with error
 const openTab = {
-  //self: this, // workaround to use methods inside other methods
-  //
-  // on page load, open manage tab, based on url params
+  // open tab based on url params
   openTabBasedOnUrl: function ($urlParams) {
     if ($urlParams.has('mp')) {
       let confirmation = document.getElementById('confirmation');

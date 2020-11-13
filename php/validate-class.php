@@ -82,7 +82,7 @@ class validate
         // into array with separate words
         $explode = explode(' ', $string);
         $result = true;
-        // if any of the words doesn't match preg_match
+        // if some of the words doesn't match preg_match
         // set $result = false => function returns false;
         foreach ($explode as $str) {
             if (preg_match("/^[A-Za-z'-,]{2,}$/", $str)) {
@@ -142,6 +142,8 @@ class validate
             } else if ($diff  >= 0 && $diff < 200) {
                 $_SESSION['dateOfFoundation'] = $foundationYear;
                 return $foundationYear;
+            } else {
+                return $this->error(16);
             }
         } else {
             return $this->error(11);
@@ -197,7 +199,7 @@ class validate
     // validate interest IDs
     // 
     // exists in interests table
-    // each posted interest ID is unique
+    // each POSTed interest ID is unique
     // (both to prevent manipulated data)
     public function interests($ids)
     {
@@ -335,7 +337,7 @@ class validate
             'Interest name must be longer than 2 characters.',
             'Electorate must be a number in range 30000-200000.',
             'Constituency region name must be longer than 2 characters.', // 15
-            'Try harder <wink>.'
+            'Party can not be older than 200 years.'
         ];
         array_push($this->error, $errorMessages[$errorIndex]);
         $_SESSION['errorMessage'] = $this->error;

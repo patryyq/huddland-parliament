@@ -157,7 +157,7 @@ footer {
 
 #mpName {
   padding: 1em;
-  width: 55%;
+  width: 60%;
   margin-bottom: 1em;
 }
 
@@ -202,6 +202,11 @@ footer {
   opacity: 0.5;
 }
 
+.partyName {
+  font-size: 0.9em;
+  color: #494949;
+}
+
 .browseResults a {
   opacity: 0;
   transition: opacity 350ms ease-in-out;
@@ -226,7 +231,7 @@ footer {
   box-sizing: border-box;
   font-weight: bold;
   color: #071c4a;
-  padding: 0.5em 0 0.3em 2em;
+  padding: 0.5em 0 0.3em 0;
   text-align: center;
 }
 
@@ -278,14 +283,7 @@ footer {
   justify-content: space-between;
 }
 
-input[type='text'],
-input[type='email'],
-input[type='password'],
-input[type='submit'],
-input[type='date'],
-input[type='checkbox'],
-input[type='number'],
-input[list='browsers'],
+input,
 select {
   width: 100%;
   margin-bottom: 1em;
@@ -769,7 +767,7 @@ body {
 
   #browseText {
     font-size: 1.4em;
-    padding: 1em 0 0.6em 1em;
+    padding: 1em 0 0.6em 0;
   }
 
   #xButton {

@@ -153,10 +153,6 @@ async function searchRequest(pageLoad = true) {
 // This function to be called by searchRequest();
 // Display results. If no results - display error message.
 //
-// (not sure if better appraoch is to createElement(a/div/b) then append or
-// simply store all HTML in variable and only change values,
-// like in the 'else' condition (browseResults.innerHTML))
-// (first approach looks cleaner, but second is much shorter)
 function displaySearchResults(data) {
   if (data.MPs.length > 0) {
     browseResults.innerHTML = '';
@@ -170,6 +166,11 @@ function displaySearchResults(data) {
       let div = document.createElement('div');
       div.setAttribute('class', 'mpBrowse');
 
+      // create 'span' element (child of 'div'); contains PARTY name
+      let span = document.createElement('span');
+      span.classList.add('partyName');
+      span.innerText = ', ' + data.MPs[i].name;
+
       // create 'b' element (child of 'div'); contains MP name
       let b = document.createElement('b');
       b.innerText = data.MPs[i].firstname + ' ' + data.MPs[i].lastname;
@@ -178,6 +179,8 @@ function displaySearchResults(data) {
         '8px solid ' + data.MPs[i].principal_colour.replace(/\s/g, '');
 
       div.appendChild(b);
+      div.appendChild(span);
+
       a.appendChild(div);
       browseResults.appendChild(a);
     }
@@ -196,7 +199,6 @@ function displaySearchResults(data) {
   }, 50);
 }
 
-// These two functions below don't do any complicated/logical operations.
 // Check each filter (parameter) and behave accordingly.
 //
 function displayActiveFilters() {

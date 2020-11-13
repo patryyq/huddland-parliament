@@ -3,7 +3,7 @@
 // If cookie 'filters' is set to 0 and no parameters in URL,
 // set transition:none to searchBar, so could be hidden instantly - 
 // rather than after 350ms. It only improves a 'feel' of the page.
-if ($_COOKIE['filters'] == 0 && !isset($_GET['MPname']) && !isset($_GET['interest']) && !isset($_GET['party']) && !isset($_GET['constituency'])) {
+if (isset($_COOKIE['filters']) && $_COOKIE['filters'] == 0 && !isset($_GET['MPname']) && !isset($_GET['interest']) && !isset($_GET['party']) && !isset($_GET['constituency'])) {
     $transition = 'transition:none';
 } else {
     $transition = '';

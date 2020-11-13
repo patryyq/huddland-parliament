@@ -17,7 +17,7 @@
             <div class="inputWrapper">
                 <label for="principalColour">colour</label>
                 <input id="principalColour" autocomplete="off" type="text" name="principalColour" value="<?php echo $_SESSION['principalColour'] ?? false; ?>" style="margin-bottom:0;">
-                <select id="colours" multiple style="display:none" size="10">
+                <select id="colours" multiple style="display:none" size="7">
                     <?php
                     $parliament->coloursDropdown(); ?>
                 </select>

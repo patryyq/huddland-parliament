@@ -49,9 +49,9 @@ function menuResponsive(event) {
 }
 
 // Show an element
-var show = function (elem, header = 1) {
+function show(elem, header = 1) {
   // Get the natural height of the element
-  var getHeight = function (header) {
+  function getHeight(header) {
     if (header === 1) {
       elem.style.display = 'block'; // Make it visible
       var height = elem.scrollHeight + 'px'; // Get it's height
@@ -62,9 +62,9 @@ var show = function (elem, header = 1) {
       var height = searchBarHeight;
     }
     return height;
-  };
+  }
 
-  var height = getHeight(header); // Get the natural height
+  let height = getHeight(header); // Get the natural height
   if (header === 1) {
     elem.style.height = height;
   } else if (header === 2) {
@@ -95,7 +95,7 @@ var show = function (elem, header = 1) {
     elem.style.height = '';
     //  elem.classList.remove('headerSmall');
   }, 350);
-};
+}
 
 // Hide an element
 function hide(elem, header = 1) {
@@ -147,7 +147,7 @@ function hide(elem, header = 1) {
 // 1 => manage tabs
 // 2 => header
 // 3 => search filters
-var toggle = function (elem, header = 1) {
+function toggle(elem, header = 1) {
   // If the element is visible, hide it.
   if (elem.classList.contains('is-visible')) {
     hide(elem, header);
@@ -157,7 +157,7 @@ var toggle = function (elem, header = 1) {
     return;
   }
   show(elem, header);
-};
+}
 
 menuBurger.addEventListener('click', menuResponsive);
 
@@ -182,6 +182,7 @@ window.addEventListener('resize', function () {
 
 // Show/hide tabs in manage.php.
 // Show/hide Huddland Parliament header.
+// Show/hide filters in search bar
 document.addEventListener(
   'click',
   function (event) {

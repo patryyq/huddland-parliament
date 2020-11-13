@@ -73,4 +73,20 @@ class user
         $result = $this->db->selectQuery($query, [$this->email]);
         return $result ? $result : false;
     }
+
+    // Function to encode untrusted data for XSS protection.
+    // 
+    // I could be naive, but it seems that I don't need to encode.
+    // I followed the idea of 'whitelisting', which seems to
+    // be sufficient enough in case of this website. 
+    // I allow only letters, numbers and -',. 
+    // Email is not displayed on page so it doesn't count.
+    // Each POST/GET data must either pass validation 
+    // function first or is not inserted directly into HTML.
+    //
+    // Got this function ready, in case I realised that I need it.
+    function encodeEcho($string)
+    {
+        return htmlentities($string, ENT_QUOTES, 'UTF-8');
+    }
 }
