@@ -17,7 +17,7 @@
             <div class="inputWrapper"><label for="party">party</label>
                 <?php echo $parliament->renderPartiesList('valueFromSession'); ?> </div>
             <div class="inputWrapper"><label for="constituency">constituency</label>
-                <?php echo $parliament->renderConstituenciesList('valueFromSession'); ?></div>
+                <?php echo $parliament->renderConstituenciesList('manage'); ?></div>
             <p>Interests:</p>
             <div style="width:100%" id="interestsBoxes" class="flex">
                 <?php echo $parliament->renderInterests('checkbox'); ?>

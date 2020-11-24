@@ -3,17 +3,17 @@
 $mpDetails = $parliament->getSingleMpDetails()[0];
 if ($mpDetails['firstname'] == false) header('Location: ' . APPLOCATION);
 
-$firstName = $mpDetails['firstname'];
-$lastName = $mpDetails['lastname'];
-$dateOfBirth = $mpDetails['date_of_birth'];
-$partyName = $mpDetails['name'];
-$dateOfFoundation = $mpDetails['date_of_foundation'];
+$firstName = $validate->entitiesHTML($mpDetails['firstname']);
+$lastName = $validate->entitiesHTML($mpDetails['lastname']);
+$dateOfBirth = $validate->entitiesHTML($mpDetails['date_of_birth']);
+$partyName = $validate->entitiesHTML($mpDetails['name']);
+$dateOfFoundation = $validate->entitiesHTML($mpDetails['date_of_foundation']);
 $colour =  str_replace(' ', '', $mpDetails['principal_colour']); // colours in db are kept with spaces
-$region =  $mpDetails['region'];
-$electorate =  $mpDetails['electorate'];
+$region =  $validate->entitiesHTML($mpDetails['region']);
+$electorate =  $validate->entitiesHTML($mpDetails['electorate']);
 $age = $parliament->calculateAge($dateOfBirth);
 $formatedDoB = date_format(date_create($dateOfBirth), 'd/m/Y');
-$interests = $mpDetails['interests'];
+$interests = $validate->entitiesHTML($mpDetails['interests']);
 ?>
 <style>
     .mpSingleDetail {
@@ -47,7 +47,7 @@ $interests = $mpDetails['interests'];
                     ?></h1>
                 <i>
                     <div id="randomQuote">
-                        <p class="randomQuote">"Here should be random quote, but something went wrong."</p>
+                        <p class="randomQuote">"Here a random quote should appear, but unfortunately something went wrong."</p>
                     </div>
                 </i>
             </div>

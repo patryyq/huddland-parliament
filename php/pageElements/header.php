@@ -33,9 +33,10 @@ header('Content-type: text/html; charset=utf-8');
         <div id="toggleHeader" class="header vis">
             <div class="headerText">
                 <h1>Huddland Parliament</h1>
-                <div id="topDesc" style="height:auto;opacity:1;transition:unset">The Huddland Parliament has two Houses that work on behalf of Huddland citizens to check and challenge the work of Government, make and shape effective laws, and debate/make decisions on the big issues of the day.</div>
+                <div id="topDesc">The Huddland Parliament has two Houses that work on behalf of Huddland citizens to check and challenge the work of Government, make and shape effective laws, and debate/make decisions on the big issues of the day.</div>
             </div>
         </div>
         <div id="xButton" class="visible"></div>
         <script src='js/general.js'></script>
     </header>
+    <!-- <div id="topDesc" style="height:auto;opacity:1;transition:unset"> -->

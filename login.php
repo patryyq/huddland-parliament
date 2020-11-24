@@ -8,4 +8,4 @@ if ($user->isLoggedIn()) {
     $user->logIn() ? header('Location: ' . APPLOCATION) : false;
 }
 
-include('pageElements/loginPage.php');
+include('php/pageElements/loginPage.php');

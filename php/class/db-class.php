@@ -137,7 +137,7 @@ class db
         header('Location: manage.php?constituency');
     }
 
-    // functions to get all rows from specific tables
+    // functions to get all rows from specific table
     //
     // 
     public function getAllMp()
@@ -165,19 +165,26 @@ class db
         return $this->selectQuery($query);
     }
 
+    public function isConstRepresented($constituencyIDtoCheck)
+    {
+        $query = "SELECT GROUP_CONCAT(constituency_id) as constID FROM members";
+        $representedConstituencies = explode(',', $this->selectQuery($query)[0]['constID']);
+        return (in_array($constituencyIDtoCheck, $representedConstituencies));
+    }
+
     // functions used in search feature
     // 
     //
     public function searchMPname($MPname)
     {
-        // if more than 1 word => match firstname and lastname
+        // (more than 1 word) ? match firstname AND lastname;
         if (count(explode(' ', $MPname)) > 1) {
             $firstname = explode(' ', $MPname)[0];
             $lastname = str_replace($firstname . ' ', '', $MPname);
             $query = "SELECT id FROM members WHERE firstname = ? AND lastname = ?";
             $result = $this->selectQuery($query, [$firstname, $lastname]);
 
-            // if 1 word => match firstname or lastname
+            // (1 word) ? match firstname OR lastname;
         } else if (count(explode(' ', $MPname)) === 1) {
             $query = "SELECT id FROM members WHERE firstname = ? OR lastname = ?";
             $result = $this->selectQuery($query, [$MPname, $MPname]);

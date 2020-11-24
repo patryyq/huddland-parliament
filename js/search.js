@@ -14,20 +14,8 @@ const filterConstituency = document.getElementById('filterConstituency');
 const filterInterest = document.getElementById('filterInterest');
 const filterNone = document.getElementById('filterNone');
 const showHideButton = document.getElementById('showHideFilters');
-const searchBarHeight = document.getElementById('searchInputsWrapper')
-  .scrollHeight;
+const searchBarHeight = document.getElementById('searchInputsWrapper').scrollHeight;
 
-// Compare last params with current params to avoid sending same request
-// (in case user spam clicks Search button).
-//
-// As string because it's simplest way to store and compare:
-// lastParams/currentParams = MPname + party + constituency + interest
-// lastParams !== currentParams
-//
-// (could bypass that by JS code manipulation, therefore server-side solution
-// on top of that needed anyway - keep requests data (or count) in $_SESSION or something)
-//
-// (avoid needless requests)
 let lastParams = '';
 async function searchRequest(pageLoad = true) {
   let send = false;
@@ -36,14 +24,7 @@ async function searchRequest(pageLoad = true) {
 
   // user clicks Search button
   if (pageLoad) {
-    if (
-      MPname.value !== '' ||
-      party.value !== '' ||
-      interest.value !== '' ||
-      constituency.value !== ''
-    ) {
-      send = true;
-    }
+    if (MPname.value !== '' || party.value !== '' || interest.value !== '' || constituency.value !== '') send = true;
     var params = {
       MPname: MPname.value,
       party: party.value,
@@ -53,14 +34,7 @@ async function searchRequest(pageLoad = true) {
     // If some param in URL (user copy/pasted url with param), send request with data from URL.
     // (only on page load cause !pageLoad)
   } else {
-    if (
-      url.get('MPname') !== null ||
-      url.get('party') !== null ||
-      url.get('constituency') !== null ||
-      url.get('interest') !== null
-    ) {
-      send = true;
-    }
+    if (url.get('MPname') !== null || url.get('party') !== null || url.get('constituency') !== null || url.get('interest') !== null) send = true;
     var params = {
       MPname: url.get('MPname'),
       party: url.get('party'),
@@ -70,18 +44,16 @@ async function searchRequest(pageLoad = true) {
   }
 
   // Set string variable with currently used parameters to compare it with last request.
-  let currentParams =
-    params.MPname + params.party + params.constituency + params.interest;
+  let currentParams = params.MPname + params.party + params.constituency + params.interest;
 
   // If some parameter is set (send === true), and parameters
   // are different than in last request, send request.
   // (avoid needless requests)
   if (send === true && currentParams !== lastParams) {
-    lastParams =
-      params.MPname + params.party + params.constituency + params.interest;
+    lastParams = params.MPname + params.party + params.constituency + params.interest;
     console.log('Request:');
     console.log(params);
-    const path = '';
+    const path = 'php/';
     const requestUrl = path + 'search.php';
     const opts = {
       headers: { Accept: 'application/json' },
@@ -105,16 +77,10 @@ async function searchRequest(pageLoad = true) {
     // Can't take data directly from URL cause it's huge
     // security issue, so instead will take it from PHP response
     // which is validated, therefore more secure.
-    MPname.value = data.validParameters.MPname
-      ? data.validParameters.MPname
-      : '';
+    MPname.value = data.validParameters.MPname ? data.validParameters.MPname : '';
     party.value = data.validParameters.party ? data.validParameters.party : '';
-    constituency.value = data.validParameters.constituency
-      ? data.validParameters.constituency
-      : '';
-    interest.value = data.validParameters.interest
-      ? data.validParameters.interest
-      : '';
+    constituency.value = data.validParameters.constituency ? data.validParameters.constituency : '';
+    interest.value = data.validParameters.interest ? data.validParameters.interest : '';
 
     // display search results
     // display used params/filter
@@ -122,15 +88,11 @@ async function searchRequest(pageLoad = true) {
     displayActiveFilters();
   } else if (
     send === false &&
-    (url.has('MPname') ||
-      MPname.value.length === 0 ||
-      url.has('party') ||
-      url.has('constituency') ||
-      url.has('interest'))
+    (url.has('MPname') || MPname.value.length === 0 || url.has('party') || url.has('constituency') || url.has('interest'))
   ) {
     // User click Search button, but no filters are set (all fields clear)
     // and some param in URL => reset url and display all MPs (saved on page load).
-    let urlParam = '';
+    let urlParam = '?';
 
     // If single filter was set and user removed it, then tried to set the same
     // filter again it wouldn't let it, cause lastParams and currentParams would be the same => don't send.
@@ -175,8 +137,7 @@ function displaySearchResults(data) {
       let b = document.createElement('b');
       b.innerText = data.MPs[i].firstname + ' ' + data.MPs[i].lastname;
 
-      div.style.borderLeft =
-        '8px solid ' + data.MPs[i].principal_colour.replace(/\s/g, '');
+      div.style.borderLeft = '8px solid ' + data.MPs[i].principal_colour.replace(/\s/g, '');
 
       div.appendChild(b);
       div.appendChild(span);
@@ -301,7 +262,7 @@ if (
   getCookie('filters') == 0
 ) {
   let element = document.getElementById('searchInputsWrapper');
-  hide(element, 3);
+  hide(element, 3, 0);
 } else {
   // Scenario: User clicks 'Hide Filters', but some filters are active. Right now, the search bar will close
   // and cookie set to 0. So, if users refreshes the page (with params), the search bar will open,

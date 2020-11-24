@@ -22,9 +22,22 @@ body {
   border: none;
 }
 
+/* Hide scrollbar */
+html {
+  overflow: scroll;
+  overflow-x: hidden;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+::-webkit-scrollbar {
+  width: 0px;
+}
+
 h1 {
+  text-align: center;
   font-size: 2.5em;
-  margin: 1em 0 1em 3em;
+  margin: 1em 0;
   color: #071c4a;
 }
 
@@ -126,8 +139,7 @@ footer {
   background-image: url('../img/parliament.png');
   background-position: 90% 50%;
   background-repeat: no-repeat;
-  transition: height 350ms ease-in-out, padding 350ms ease-in-out,
-    background-image 350ms ease-in-out, background-position 350ms ease-in-out;
+  transition: height 350ms ease-in-out, padding 350ms ease-in-out, background-image 350ms ease-in-out, background-position 350ms ease-in-out;
 }
 
 .headerSmall {
@@ -137,6 +149,7 @@ footer {
 }
 
 .header h1 {
+  text-align: left;
   margin: 0;
   width: 100%;
 }
@@ -169,6 +182,7 @@ footer {
 }
 
 #mpName h1 {
+  text-align: left;
   margin-left: 0.6em;
   margin-bottom: 0.3em;
 }
@@ -427,10 +441,11 @@ input[type='date'].successField {
 }
 
 .confirmation {
-  padding: 1.7em;
-  font-size: 1.7em;
+  padding: 1.5em 1em;
+  font-size: 1.5em;
   background: #b9cfff;
   margin: 2em 1em;
+  border-bottom: 3px solid #071c4a;
 }
 
 .flex {
@@ -604,16 +619,6 @@ input[type='date'].successField {
   box-sizing: border-box;
 }
 
-/* Hide scrollbar for Chrome, Safari and Opera */
-body::-webkit-scrollbar {
-  display: none;
-}
-
-body {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
-}
-
 @media screen and (max-width: 1024px) {
   .wrapper,
   #menu,
@@ -653,7 +658,7 @@ body {
   }
 
   .confirmation {
-    padding: 0.5em;
+    padding: 0.8em 0.5em;
     font-size: 1.3em;
     margin: 0.5em;
   }

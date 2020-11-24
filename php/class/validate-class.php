@@ -43,15 +43,9 @@ class validate
     public function singleWord($value, $index)
     {
         if (preg_match("/^[A-Za-z'-]{3,}$/", $value)) {
-            $_SESSION[$index] = $value;
-            return $value;
-        } else {
-            if ($index == 'firstname') {
-                return $this->error(0);
-            } else if ($index == 'lastname') {
-                return $this->error(1);
-            }
+            return $_SESSION[$index] = $value;
         }
+        return ($index === 'firstname' ? $this->error(0) : ($index === 'lastname' ? $this->error(1) : false));
     }
 
     // validate electorate number
@@ -60,13 +54,8 @@ class validate
     // trim whitespace and ,.
     public function electorate($number)
     {
-        $striped = preg_replace('/[.,]/', '', $number);
-        if (intval($striped) > 30000 & intval($striped) < 200000) {
-            $_SESSION['electorate'] = $striped;
-            return $striped;
-        } else {
-            $this->error(14);
-        }
+        $striped = intval(preg_replace('/[.,]/', '', $number));
+        return ($striped > 30000 && $striped < 200000) ? $_SESSION['electorate'] = $striped : $this->error(14);
     }
 
     // validate multiple words: region, interest, party
@@ -77,25 +66,19 @@ class validate
     // only letters and '-,
     public function multipleWords($value, $index = false)
     {
-        $explode = explode(' ', $value);
+        $words = explode(' ', $value);
         $result = true;
+
         // if any of the words doesn't match -> function returns false;
-        foreach ($explode as $str) {
-            if (!preg_match("/^[A-Za-z'-,]{2,}$/", $str)) $result = false;
+        foreach ($words as $wrd) {
+            if (!preg_match("/^[A-Za-z'-,]{2,}$/", $wrd)) $result = false;
         }
 
         if ($result === true && strlen($value) > 2) {
             if ($index) $_SESSION[$index] = $value;
             return $value;
-        } else {
-            if ($index == 'partyName') {
-                return $this->error(2);
-            } else if ($index == 'interestName') {
-                return $this->error(13);
-            } else if ($index == 'constituencyRegion') {
-                return $this->error(15);
-            }
         }
+        return ($index === 'partyName' ? $this->error(2) : ($index === 'interestName' ? $this->error(13) : ($index === 'constituencyRegion' ? $this->error(15) : false)));
     }
 
     // validate date of birth
@@ -109,13 +92,7 @@ class validate
             $age = new parliament();
             $age = intval($age->calculateAge($dateOfBirth));
         }
-
-        if ($age >= 18 && $age < 95) {
-            $_SESSION['dateOfBirth'] = $dateOfBirth;
-            return $dateOfBirth;
-        } else {
-            return $this->error(3);
-        }
+        return ($age >= 18 && $age < 95) ? $_SESSION['dateOfBirth'] = $dateOfBirth : $this->error(3);
     }
 
     // validate party foundation year
@@ -134,14 +111,12 @@ class validate
             if ($diff  < 0) {
                 return $this->error(10);
             } else if ($diff  >= 0 && $diff < 200) {
-                $_SESSION['dateOfFoundation'] = $foundationYear;
-                return $foundationYear;
+                return $_SESSION['dateOfFoundation'] = $foundationYear;
             } else {
                 return $this->error(16);
             }
-        } else {
-            return $this->error(11);
         }
+        return $this->error(11);
     }
 
     // validate email
@@ -150,12 +125,7 @@ class validate
     // after '@': mix of letter and '-' + dot(.) + 2-7 letters
     public function email($email)
     {
-        if (preg_match("/^[a-zA-Z0-9_+&*-]+(?:\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,7}$/", $email)) {
-            $_SESSION['email'] = $email;
-            return $email;
-        } else {
-            return $this->error(4);
-        }
+        return (preg_match("/^[a-zA-Z0-9_+&*-]+(?:\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,7}$/", $email)) ? $_SESSION['email'] = $email : $this->error(4);
     }
 
     // validate ID: mp, party, constituency
@@ -163,28 +133,37 @@ class validate
     // is_numeric()
     // exists in given table name 
     // (prevent manipulated data)
-    public function id($id, $table)
+    public function id($value, $index)
     {
         $db = new db();
-        $fieldName = $table;
-        $table == 'party' ? $table = $db->getAllParties() : ($table == 'mp' ? $table = $db->getAllMp() : ($table == 'constituency' ? $table = $db->getAllConstituencies() : ($table == 'interestSearch' ? $table = $db->getAllInterests() : false)));
+        $inputName = $index;
+
+        switch ($index) {
+            case 'party':
+                $IDs = $db->getAllParties();
+            case 'mp':
+                $IDs = $db->getAllMp();
+            case 'constituency':
+                $IDs = $db->getAllConstituencies();
+            case 'interestSearch':
+                $IDs = $db->getAllInterests();
+        }
 
         $result = false;
-        if (is_numeric($id)) {
-            foreach ($table as $row) {
-                if ($row['id'] == $id) $result = $id;
+        if (is_numeric($value)) {
+            foreach ($IDs as $id) {
+                if ($id['id'] == $value) $result = $value;
             }
         }
 
         if ($result) {
-            $_SESSION[$fieldName] = $result;
-            return $result;
+            return $_SESSION[$inputName] = $result;
         } else {
-            if ($fieldName == 'party') {
+            if ($inputName === 'party') {
                 return $this->error(5);
-            } else if ($fieldName == 'constituency') {
+            } else if ($inputName === 'constituency') {
                 return $this->error(7);
-            } else if ($fieldName == 'mp') {
+            } else if ($inputName === 'mp') {
                 return $this->error(9);
             }
         }
@@ -213,14 +192,13 @@ class validate
                     }
                 }
                 // $resultTemp === false; means, either the ID is duplicated or not exist in DB -> set $result to false
-                $resultTemp == true ? true : $result = false;
+                $resultTemp === true ? true : $result = false;
             }
 
             $_SESSION['interests'] = $validIDs;
-            return ($result && count($ids) == count($validIDs) ? $ids : $this->error(6));
-        } else {
-            return $this->error(6);
+            return ($result && count($ids) === count($validIDs) ? $ids : $this->error(6));
         }
+        return $this->error(6);
     }
 
     // validate principal colour
@@ -229,12 +207,9 @@ class validate
     public function matchColour($principalColour)
     {
         $colours = new parliament();
-        if (array_key_exists(preg_replace('/\s+/', '', $principalColour), $colours->principalColoursList)) {
-            $_SESSION['principalColour'] = $principalColour;
-            return $principalColour;
-        } else {
-            return $this->error(12);
-        }
+        return (array_key_exists(preg_replace('/\s+/', '', $principalColour), $colours->principalColoursList)) ?
+            $_SESSION['principalColour'] = $principalColour :
+            $this->error(12);
     }
 
     // get POST data
@@ -258,7 +233,7 @@ class validate
 
     // main validation function called by 'ADD to DB' functions
     //
-    // check if all needed fields for specific action are filled and passed validation
+    // validate all required input fields for specific action
     public function validatePostData($action)
     {
         $rawPostData = $this->rawPostData();
@@ -268,7 +243,6 @@ class validate
         foreach ($keysArray as $index) {
             if (!array_key_exists($index, $rawPostData) || !$this->validateField($index, $rawPostData[$index])) $result = false;
         }
-
         return $result ? $rawPostData : false;
     }
 
@@ -330,54 +304,34 @@ class validate
     {
         $confirmationMessages = [
             [
-                'You have succesfully added MP:<br><b>',
+                'You have succesfully added MP: <b>',
                 '</b>',
                 ($_SESSION['addMPdetails'] ?? false)
             ],
             [
-                'You have succesfully added party:<br><b>',
+                'You have succesfully added party: <b>',
                 '</b>',
                 ($_SESSION['addPARTYdetails'] ?? false)
             ],
             [
-                'You have succesfully added interest:<br><b>',
+                'You have succesfully added interest: <b>',
                 '</b>',
                 ($_SESSION['addINTERESTdetails'] ?? false)
             ],
             [
-                'You have succesfully added constituency:<br><b>',
+                'You have succesfully added constituency: <b>',
                 '</b>',
                 ($_SESSION['addCONSTITUENCYdetails'] ?? false)
             ],
         ];
+
         array_push($this->message, $confirmationMessages[$messageIndex]);
-        $_SESSION['confirmationMessage'] = $this->message;
-        return true;
+        return $_SESSION['confirmationMessage'] = $this->message;
     }
 
-    // Function to safely use untrusted data - XSS protection.
-    // 
-    // I could be naive, but it seems that in case
-    // of this website, I don't need to use htmlentities().
-    // All data must pass validation functions first and only 
-    // letters, numbers and -', are allowed. Followed the idea of 
-    // 'whitelisting', which seems to be sufficient. 
-    // (email is not displayed on the page so it doesn't count)
-    //
-    // I think the only way to break it, is to put a malicious code into DB 
-    // manually, but then I have a bigger problem than encoding...
-    //
-    // It is absolutely necessary, if characters like '&' or '#' are allowed. 
-    // I think, nothing could go wrong with only letters, numbers and -',.
-    // 
-    // Tried to google this topic for a while, but didn't find a precise answer. 
-    // Everyone says, it is a must. Then prove it with few examples with use of
-    // the '&#0000106', '&#106;' or any other weird encoding stuff. None of them
-    // mention the case where these characters are not allowed.
-    //
-    // Got this function ready, in case I realised that I need it.
-    function entitiedData($value)
+    // encode/escape untrusted data - XSS protection.
+    function entitiesHTML($untrustedData)
     {
-        return htmlentities($value, ENT_QUOTES, 'UTF-8');
+        return htmlentities($untrustedData, ENT_QUOTES, 'UTF-8');
     }
 }

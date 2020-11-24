@@ -21,9 +21,6 @@ header('Content-type: text/html; charset=utf-8');
             <input type="submit" name="submit" value="Sign in">
         </form>
     </div>
-
-    <!-- prevent form resubmission when page is refreshed; not server-side solution but I believe it's good enough for my needs
-source: https://stackoverflow.com/questions/6320113/how-to-prevent-form-resubmission-when-page-is-refreshed-f5-ctrlr/16334537 -->
     <script>
         if (window.history.replaceState) {
             window.history.replaceState(null, null, window.location.href);

@@ -54,27 +54,20 @@ const openTab = {
   // manage INTEREST tab
   interest: document.getElementById('interests'),
   openInterest: function () {
-    this.interest.nextElementSibling.firstElementChild.classList.add(
-      'is-visible'
-    );
+    this.interest.nextElementSibling.firstElementChild.classList.add('is-visible');
     this.interest.style.backgroundImage = "url('img/arrow-down-1.png')";
   },
 
   // manage CONSTITUENCY tab
   constituency: document.getElementById('constituencyTab'),
   openConstituency: function () {
-    this.constituency.nextElementSibling.firstElementChild.classList.add(
-      'is-visible'
-    );
+    this.constituency.nextElementSibling.firstElementChild.classList.add('is-visible');
     this.constituency.style.backgroundImage = "url('img/arrow-down-1.png')";
   },
 
   // any submit button clicked, ask if sure
   confirmAction: function (event) {
-    if (
-      event.target.getAttribute('type') == 'submit' &&
-      !confirm('Are you sure?')
-    ) {
+    if (event.target.getAttribute('type') == 'submit' && !confirm('Are you sure?')) {
       event.preventDefault();
     }
   },
@@ -164,10 +157,7 @@ openSelect = function (event) {
 input.addEventListener('focus', openSelect);
 input.addEventListener('keyup', searchColour);
 body.addEventListener('click', function (event) {
-  if (
-    !event.target.classList.contains('colourOption') &&
-    event.target.getAttribute('id') != 'principalColour'
-  ) {
+  if (!event.target.classList.contains('colourOption') && event.target.getAttribute('id') != 'principalColour') {
     select.style.display = 'none';
     input.parentElement.parentElement.parentElement.style.overflow = 'hidden';
   }
@@ -176,9 +166,7 @@ select.addEventListener('click', function (event) {
   if (event.target.classList.contains('colourOption')) {
     console.log(event.target.innerText);
     input.value = event.target.innerText;
-    input.style =
-      'padding: 8px;margin-bottom:0;border:4px solid ' +
-      event.target.innerText.replace(/\s/g, '');
+    input.style = 'padding: 8px;margin-bottom:0;border:4px solid ' + event.target.innerText.replace(/\s/g, '');
     select.style.display = 'none';
     input.parentElement.parentElement.parentElement.style.overflow = 'hidden';
   }

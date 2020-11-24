@@ -1,10 +1,11 @@
 const xButton = document.getElementById('xButton');
+const menu = document.getElementById('menuItems');
+const menuBurger = document.getElementById('menuBurger');
 const header = document.getElementsByClassName('header')[0];
 const topDesc = document.getElementById('topDesc');
-const menuBurger = document.getElementById('menuBurger');
 const headerHeight = document.getElementById('toggleHeader').scrollHeight;
 
-// Get currently set GET/URL parameters.
+// Get URL parameters.
 function urlParams() {
   let url = new URL(window.location.href);
   let params = new URLSearchParams(url.search);
@@ -30,10 +31,106 @@ function getCookie(name) {
   return false;
 }
 
-function menuResponsive(event) {
-  let menu = event.target.previousElementSibling;
+// Get the natural height of an element
+function getHeight(elem, eventTarget) {
+  if (eventTarget === 1) {
+    elem.style.display = 'block';
+    var height = elem.scrollHeight + 'px';
+    elem.style.display = '';
+  } else if (eventTarget === 2) {
+    var height = headerHeight;
+  } else if (eventTarget === 3) {
+    var height = searchBarHeight;
+  }
+  return height;
+}
 
-  // All class/display menu states and window resize taken into consideration.
+// Show an element
+function show(elem, eventTarget) {
+  let height = getHeight(elem, eventTarget); // Get the natural height
+
+  if (eventTarget === 1) {
+    elem.style.height = height;
+    elem.parentElement.previousElementSibling.style.backgroundImage = "url('img/arrow-down-1.png')";
+    elem.classList.add('is-visible'); // Make the element visible
+  } else if (eventTarget === 2) {
+    elem.style = 'height:' + height + 'px';
+    elem.classList.remove('headerSmall');
+    topDesc.style = 'opacity: 1';
+    xButton.classList.replace('hidden', 'visible');
+    elem.classList.add('vis'); // Make the element visible
+    setCookie(1, 'header');
+  } else if (eventTarget === 3) {
+    elem.style = 'height:' + height + 'px;margin-top:0.8em';
+    showHideButton.innerText = 'Hide Filters';
+    filters.style = 'height:' + filtersHeight + 'px';
+    elem.classList.add('vis'); // Make the element visible
+    setCookie(1, 'filters');
+  }
+
+  // Remove fixed height after transition, so the element is still responsive
+  window.setTimeout(function () {
+    elem.style.height = '';
+  }, 350);
+}
+
+function toggle(elem, eventTarget) {
+  elem.classList.contains('is-visible') || elem.classList.contains('vis') ? hide(elem, eventTarget, 30) : show(elem, eventTarget);
+}
+
+// Hide an element
+// Without delay, transitions doesn't work properly
+function hide(elem, eventTarget, delay) {
+  // Give the element a height to change from
+  elem.style.height = elem.scrollHeight + 'px';
+
+  if (eventTarget === 1) {
+    hideManageTabs(elem);
+  } else if (eventTarget === 2) {
+    hidePageHeader(elem);
+  } else if (eventTarget === 3) {
+    hideSearchFilters(elem);
+  }
+
+  // change height; need small delay to make it work on Firefox
+  window.setTimeout(function () {
+    elem.classList.contains('header') ? (elem.style.height = '100px') : (elem.style.height = '0');
+  }, delay);
+
+  // after transition, remove 'visibile' classes
+  window.setTimeout(function () {
+    eventTarget === 1 ? elem.classList.remove('is-visible') : elem.classList.remove('vis');
+  }, 350 + delay);
+}
+
+function hideManageTabs(elem) {
+  elem.parentElement.previousElementSibling.style.backgroundImage = "url('img/arrow-right-1.png')";
+}
+
+function hidePageHeader(elem) {
+  elem.classList.add('headerSmall');
+  topDesc.style = 'opacity:0';
+  setCookie(0, 'header');
+  xButton.classList.replace('visible', 'hidden');
+}
+
+function hideSearchFilters(elem) {
+  if (filterNone.style.display === 'inline-block') filters.style = 'height: 0;margin-top: 0';
+  elem.style.marginTop = '0';
+  showHideButton.innerText = 'Show Filters';
+  setCookie(0, 'filters');
+}
+
+function windowResizeMobileMenuBehaviour() {
+  if (window.innerWidth > 790) {
+    if (menu.getAttribute('style') === null || menu.getAttribute('style') === '' || menu.style.display === 'none' || menu.style.display === 'block')
+      menu.style.display = 'flex';
+  } else {
+    menu.style.display = 'none';
+  }
+}
+
+function toggleMobileMenu() {
   if (menu.classList.contains('vis-resp') && menu.style.display === 'none') {
     menu.classList.remove('vis-resp');
     menu.style.display = 'block';
@@ -48,160 +145,37 @@ function menuResponsive(event) {
   }
 }
 
-// Show an element
-function show(elem, header = 1) {
-  // Get the natural height of the element
-  function getHeight(header) {
-    if (header === 1) {
-      elem.style.display = 'block'; // Make it visible
-      var height = elem.scrollHeight + 'px'; // Get it's height
-      elem.style.display = ''; //  Hide it again
-    } else if (header === 2) {
-      var height = headerHeight;
-    } else if (header === 3) {
-      var height = searchBarHeight;
-    }
-    return height;
+function whichElementToToggle(event) {
+  // Toggle tabs in manage.php.
+  if (event.target.classList.contains('manageTitle')) {
+    const elementToToggle = event.target.nextElementSibling.firstElementChild;
+    toggle(elementToToggle, 1);
+
+    // Toggle Huddland Parliament header.
+  } else if (event.target.getAttribute('id') === 'xButton') {
+    const elementToToggle = document.getElementById('toggleHeader');
+    toggle(elementToToggle, 2);
+
+    // Toggle search bar
+  } else if (event.target.getAttribute('id') === 'showHideFilters') {
+    const elementToToggle = document.getElementById('searchInputsWrapper');
+    toggle(elementToToggle, 3);
   }
 
-  let height = getHeight(header); // Get the natural height
-  if (header === 1) {
-    elem.style.height = height;
-  } else if (header === 2) {
-    elem.style = 'height:' + height + 'px';
-  } else if (header === 3) {
-    elem.style = 'height:' + height + 'px;margin-top:0.8em';
-    showHideButton.innerText = 'Hide Filters';
-    filters.style = 'height:' + filtersHeight + 'px';
+  // Toggle mobile menu
+  else if (event.target.getAttribute('id') === 'menuBurger') {
+    toggleMobileMenu();
   }
-
-  if (header === 1) {
-    elem.parentElement.previousElementSibling.style.backgroundImage =
-      "url('img/arrow-down-1.png')";
-    elem.classList.add('is-visible'); // Make the element visible
-  } else if (header === 2) {
-    elem.classList.remove('headerSmall');
-    topDesc.style = 'height:auto;opacity: 1';
-    xButton.classList.replace('hidden', 'visible');
-    elem.classList.add('vis'); // Make the element visible
-    setCookie(1, 'header');
-  } else if (header === 3) {
-    elem.classList.add('vis'); // Make the element visible
-    setCookie(1, 'filters');
-  }
-
-  // Once the transition is complete, remove the inline max-height so the content can scale responsively
-  window.setTimeout(function () {
-    elem.style.height = '';
-    //  elem.classList.remove('headerSmall');
-  }, 350);
 }
 
-// Hide an element
-function hide(elem, header = 1) {
-  // Give the element a height to change from
-  elem.style.height = elem.scrollHeight + 'px';
-  if (header === 1) {
-    elem.parentElement.previousElementSibling.style.backgroundImage =
-      "url('img/arrow-right-1.png')";
-  } else if (header === 2) {
-    if (getCookie('header') == 0) {
-      topDesc.style = 'height:0px;opacity:0;transition:unset';
-    } else {
-      topDesc.style = 'height:0px;opacity:0';
-    }
-    xButton.classList.replace('visible', 'hidden');
-    elem.classList.add('headerSmall');
-    setCookie(0, 'header');
-  } else if (header === 3) {
-    if (filterNone.style.display === 'inline-block') {
-      filters.style = 'height: 0;margin-top: 0';
-    }
-    elem.style.marginTop = '0';
-    showHideButton.innerText = 'Show Filters';
-    setCookie(0, 'filters');
-  }
+window.addEventListener('resize', windowResizeMobileMenuBehaviour);
+document.addEventListener('click', whichElementToToggle);
 
-  // Set the height back to 0
-  window.setTimeout(function () {
-    if (elem.classList.contains('header')) {
-      elem.style.height = '100px';
-    } else {
-      elem.style.height = '0';
-    }
-  }, 1);
-
-  // When the transition is complete, hide it
-  window.setTimeout(function () {
-    if (header === 1) {
-      elem.classList.remove('is-visible');
-    } else if (header === 2) {
-      elem.classList.remove('vis');
-    } else if (header === 3) {
-      elem.classList.remove('vis');
-    }
-  }, 350);
-}
-
-// Toggle element visibility
-// 1 => manage tabs
-// 2 => header
-// 3 => search filters
-function toggle(elem, header = 1) {
-  // If the element is visible, hide it.
-  if (elem.classList.contains('is-visible')) {
-    hide(elem, header);
-    return;
-  } else if (elem.classList.contains('vis')) {
-    hide(elem, header);
-    return;
-  }
-  show(elem, header);
-}
-
-menuBurger.addEventListener('click', menuResponsive);
-
-// If user is on Desktop and opens 'Responsive Menu' with
-// screen width < 790 and then resizes screen to width > 790 =>
-// change menu display from 'block' to 'flex' so it looks better
-window.addEventListener('resize', function () {
-  let menu = document.getElementById('menuItems');
-  if (window.innerWidth > 790) {
-    if (
-      menu.getAttribute('style') === null ||
-      menu.getAttribute('style') === '' ||
-      menu.style.display === 'none' ||
-      menu.style.display === 'block'
-    ) {
-      menu.style.display = 'flex';
-    }
-  } else {
-    menu.style.display = 'none';
-  }
-});
-
-// Show/hide tabs in manage.php.
-// Show/hide Huddland Parliament header.
-// Show/hide filters in search bar
-document.addEventListener(
-  'click',
-  function (event) {
-    if (event.target.classList.contains('manageTitle')) {
-      let element = event.target.nextElementSibling.firstElementChild;
-      toggle(element, 1);
-    } else if (event.target.getAttribute('id') === 'xButton') {
-      let element = document.getElementById('toggleHeader');
-      toggle(element, 2);
-    } else if (event.target.getAttribute('id') === 'showHideFilters') {
-      let element = document.getElementById('searchInputsWrapper');
-      toggle(element, 3);
-    }
-  },
-  false
-);
-
+// hide Huddland Parliament header on load?
 if (getCookie('header') == 0) {
-  let element = document.getElementById('toggleHeader');
+  topDesc.style = 'opacity:0;transition:none';
+  const element = document.getElementById('toggleHeader');
   element.style.transition = 'none';
-  hide(element, 2);
+  hide(element, 2, 0);
+  topDesc.style = 'opacity:0';
 }

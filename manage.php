@@ -38,9 +38,9 @@ if ((isset($_GET['mp']) ||
 ) header('Location: manage.php');
 
 
-include('pageElements/header.php');
-include('pageElements/managePage.php');
-include('pageElements/footer.php');
+include('php/pageElements/header.php');
+include('php/pageElements/managePage.php');
+include('php/pageElements/footer.php');
 
 unset($_SESSION['errorMessage']);
 unset($_SESSION['confirmationMessage']);

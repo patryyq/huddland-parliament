@@ -3,7 +3,7 @@
 // set transition:none in searchBar, so it hide instantly - 
 // rather than after 350ms. It improves a 'feel' of the page.
 (isset($_COOKIE['filters']) &&
-    $_COOKIE['filters'] == 0 &&
+    $_COOKIE['filters'] === '0' &&
     !isset($_GET['MPname']) &&
     !isset($_GET['interest']) &&
     !isset($_GET['party']) &&
@@ -49,7 +49,7 @@
     <div id="browseText">Huddland Parliament MPs:</div>
     <div id="browseResults" class="browseResults">
         <?php
-        $parliament->renderMpList(); ?>
+        echo $parliament->renderMpList(); ?>
     </div>
 </main>
 <script src="js/search.js"></script>

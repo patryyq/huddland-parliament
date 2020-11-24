@@ -7,6 +7,7 @@ class parliament
     {
         $this->mpID = isset($_GET['mpID']) && is_numeric($_GET['mpID']) ? $_GET['mpID'] : false;
         $this->db = new db();
+        $this->validate = new validate();
     }
 
     public function getSingleMpDetails()
@@ -48,17 +49,24 @@ class parliament
 
     public function renderMpList()
     {
-        if ($mps = $this->db->getAllMp()) {
-            foreach ($mps as $mp) {
-                $firstname = $mp['firstname'];
-                $lastname = $mp['lastname'];
-                $colour = str_replace(' ', '', $mp['principal_colour']);
-                $border = 'border-left:8px solid ' . $colour;
-                echo '<a href="mp.php?mpID=' . $mp['id'] . '"><div class="mpBrowse" style="' . $border . '"><b>' . $firstname . ' ' . $lastname . '</b>, <span class="partyName">' . $mp['name'] . '</span></div></a>';
-            }
-        } else {
-            return false;
+        $mps = $this->db->getAllMp();
+        $list = '';
+
+        foreach ($mps as $mp) {
+            $firstname = $this->validate->entitiesHTML($mp['firstname']);
+            $lastname = $this->validate->entitiesHTML($mp['lastname']);
+            $partyname = $this->validate->entitiesHTML($mp['name']);
+            $colour = str_replace(' ', '', $mp['principal_colour']);
+            $border = 'border-left:8px solid ' . $colour;
+            $list .= '
+            <a href="mp.php?mpID=' . $mp['id'] . '">
+                <div class="mpBrowse" style="' . $border . '">
+                    <b>' . $firstname . ' ' . $lastname . '</b>,
+                    <span class="partyName"> ' . $partyname . '</span>
+                </div>
+            </a>';
         }
+        return $list;
     }
 
     public function renderPartiesList($valueFromSession = false)
@@ -67,58 +75,83 @@ class parliament
             $selectStart = '<select id="party" name="party"><option value=""></option>';
             $selectEnd = '</select>';
             $options = '';
+
             foreach ($parties as $party) {
-                if (isset($_SESSION['party']) && $_SESSION['party'] == $party['id'] && $valueFromSession === 'valueFromSession') {
-                    $options .= '<option selected value="' . $party['id'] . '">' . $party['name'] . '</option>';
-                } else {
-                    $options .= '<option value="' . $party['id'] . '">' . $party['name'] . '</option>';
-                }
+                (isset($_SESSION['party']) && $_SESSION['party'] == $party['id'] && $valueFromSession === 'valueFromSession') ?
+                    $selected = ' selected' :
+                    $selected = '';
+                $options .= '<option' . $selected . ' value="' . $party['id'] . '">' . $this->validate->entitiesHTML($party['name']) . '</option>';
             }
             return $selectStart . $options . $selectEnd;
-        } else {
-            return false;
         }
+        return false;
     }
 
-    public function renderConstituenciesList($valueFromSession = false)
+    public function renderConstituenciesList($page = false)
     {
         if ($constituencies = $this->db->getAllConstituencies()) {
             $selectStart = '<select id="constituency" name="constituency"><option value=""></option>';
             $selectEnd = '</select>';
             $options = '';
+
             foreach ($constituencies as $constituency) {
-                if (isset($_SESSION['constituency']) && $_SESSION['constituency'] == $constituency['id'] && $valueFromSession === 'valueFromSession') {
-                    $options .= '<option selected value="' . $constituency['id'] . '">' . $constituency['region'] . '</option>';
-                } else {
-                    $options .= '<option value="' . $constituency['id'] . '">' . $constituency['region'] . '</option>';
+                $id = $constituency['id'];
+                $region = $this->validate->entitiesHTML($constituency['region']);
+                if ($this->isConstituencySelected($id, $page) === 1) {
+                    $options .= '<option selected value="' . $id . '">' . $region . '</option>';
+                } else if ($this->isConstituencySelected($id, $page) === 2) {
+                    $options .= '<option value="' . $id . '">' . $region . '</option>';
+                } else if ($this->isConstituencySelected($id, $page) === 3) {
+                    $options .= '<option value="' . $id . '">' . $region . '</option>';
                 }
             }
             return $selectStart . $options . $selectEnd;
-        } else {
-            return false;
         }
+        return false;
+    }
+
+    // return:
+    // 1 => constituency ID same as SESSION[constituency] AND constituency not represented by any MP; manage.php
+    // 2 => constituency not represented by any MP; manage.php
+    // 3 => render all constituencies; index.php
+    private function isConstituencySelected($givenConstID, $page = false)
+    {
+        if (
+            isset($_SESSION['constituency']) &&
+            $_SESSION['constituency'] == $givenConstID &&
+            $page === 'manage' &&
+            !$this->db->isConstRepresented($givenConstID)
+        ) {
+            $result = 1;
+        } else if (
+            $page === 'manage' &&
+            !$this->db->isConstRepresented($givenConstID)
+        ) {
+            $result = 2;
+        } else if ($page !== 'manage') {
+            $result = 3;
+        } else {
+            $result = false;
+        }
+        return $result;
     }
 
     public function renderInterests($type)
     {
         $interests = $this->db->getAllInterests();
+        $checkedInterests = isset($_SESSION['interests']) ? $_SESSION['interests'] : [];
         $input = '';
-        if ($type == 'checkbox') {
-            foreach ($interests as $interest) {
-                if (in_array($interest['id'], (isset($_SESSION['interests']) ? $_SESSION['interests'] : array()))) {
-                    $input .= '<div class="interests"><input type="checkbox" checked name="interests[]" value="' . $interest['id'] . '">' . $interest['name'] . '</div>';
-                } else {
-                    $input .= '<div class="interests"><input type="checkbox" name="interests[]" value="' . $interest['id'] . '">' . $interest['name'] . '</div>';
-                }
+
+        if ($type === 'checkbox') {
+            foreach ($interests as $int) {
+                (in_array($int['id'], $checkedInterests)) ? $checked = ' checked' : $checked = '';
+                $input .= '<div class="interests"><input type="checkbox"' . $checked . ' name="interests[]" value="' . $int['id'] . '">' . $this->validate->entitiesHTML($int['name']) . '</div>';
             }
-        } else if ($type == 'list') {
-            $selectStart = '<select id="interestSearch" name="interestSearch"><option value=""></option>';
-            $selectEnd = '</select>';
-            $input = '';
-            foreach ($interests as $interest) {
-                $input .= '<option value="' . $interest['id'] . '">' . $interest['name'] . '</option>';
+        } else if ($type === 'list') {
+            foreach ($interests as $int) {
+                $input .= '<option value="' . $int['id'] . '">' . $this->validate->entitiesHTML($int['name']) . '</option>';
             }
-            $input = $selectStart . $input . $selectEnd;
+            $input = '<select id="interestSearch" name="interestSearch"><option value=""></option>' . $input . '</select>';
         }
         return $input;
     }
@@ -158,51 +191,54 @@ class parliament
             $responseToJS->validParameters = $searchData->usedParams;
             $responseToJS->urlParameters = $searchData->urlParameters;
             return $responseToJS;
-        } else {
-            return false;
         }
+        return false;
     }
 
     private function validateAndSearch($encodedData)
     {
         $data = json_decode($encodedData);
-        $validate = new validate();
-        $validData = new stdClass();
+        $validate = $this->validate;
+        $valid = new stdClass();
 
-        $validData->MPname = $validate->multipleWords($data->MPname) ? $data->MPname : false;
-        $validData->party = $validate->id($data->party, 'party') ? $data->party : false;
-        $validData->interest = $validate->id($data->interest, 'interestSearch') ? $data->interest : false;
-        $validData->constituency = $validate->id($data->constituency, 'constituency') ? $data->constituency : false;
-        $validData->usedParams = ['MPname' => $validData->MPname, 'party' => $validData->party, 'constituency' => $validData->constituency, 'interest' => $validData->interest];
+        $valid->MPname = $validate->multipleWords($data->MPname) ? $data->MPname : false;
+        $valid->party = $validate->id($data->party, 'party') ? $data->party : false;
+        $valid->interest = $validate->id($data->interest, 'interestSearch') ? $data->interest : false;
+        $valid->constituency = $validate->id($data->constituency, 'constituency') ? $data->constituency : false;
+        $valid->usedParams = [
+            'MPname' => $valid->MPname,
+            'party' => $valid->party,
+            'constituency' => $valid->constituency,
+            'interest' => $valid->interest
+        ];
 
-        // url based on valid fields
         $numberValidField = 0;
         $url = '?';
-        if ($validData->MPname) {
-            $url .= 'MPname=' . $validData->MPname . '&';
-            $validData->MPname = $this->db->searchMPname($validData->MPname);
+        if ($valid->MPname) {
+            $url .= 'MPname=' . $valid->MPname . '&';
+            $valid->MPname = $this->db->searchMPname($valid->MPname);
             $numberValidField++;
         }
-        if ($validData->party) {
-            $url .= 'party=' . $validData->party . '&';
-            $validData->party = $this->db->searchMpPartyID($validData->party);
+        if ($valid->party) {
+            $url .= 'party=' . $valid->party . '&';
+            $valid->party = $this->db->searchMpPartyID($valid->party);
             $numberValidField++;
         }
-        if ($validData->constituency) {
-            $url .= 'constituency=' . $validData->constituency . '&';
-            $validData->constituency = $this->db->searchMpConstituencyID($validData->constituency);
+        if ($valid->constituency) {
+            $url .= 'constituency=' . $valid->constituency . '&';
+            $valid->constituency = $this->db->searchMpConstituencyID($valid->constituency);
             $numberValidField++;
         }
-        if ($validData->interest) {
-            $url .= 'interest=' . $validData->interest . '&';
-            $validData->interest = $this->db->searchMpInterestID($validData->interest);
+        if ($valid->interest) {
+            $url .= 'interest=' . $valid->interest . '&';
+            $valid->interest = $this->db->searchMpInterestID($valid->interest);
             $numberValidField++;
         }
 
         // number of MP's IDs === number of valid fields ? given ID meets all search criteria;
-        $validData->numberOfValidFields = $numberValidField;
-        $validData->urlParameters = $url;
-        return $validData;
+        $valid->numberOfValidFields = $numberValidField;
+        $valid->urlParameters = $url;
+        return $valid;
     }
 
     private function isJSON($encodedDataFromJS)

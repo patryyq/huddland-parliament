@@ -27,16 +27,13 @@ class user
     public function logIn()
     {
         if ($result = $this->getDetailsToLogIn()) {
-            if ($this->verifyPassword($this->password, $result[0]['password'])) {
-                $_SESSION['name'] = $result[0]['name'];
+            if (password_verify($this->password, $result[0]['password'])) {
                 $_SESSION['admin'] = $result[0]['role'] == '2' ? true : false;
-                return true;
-            } else {
-                $this->error = "Email or password doesn't match.";
-                return false;
+                return $_SESSION['name'] = $result[0]['name'];
             }
         }
         $this->error = "Email or password doesn't match.";
+        return false;
     }
 
     public function logOut()
@@ -47,22 +44,13 @@ class user
 
     public function renderLogInError()
     {
-        $this->error ?
-            $error = '<div class="error">' . $this->error . '</div>' :
-            $error = '';
-        return $error;
-    }
-
-    private function verifyPassword($password, $hashFromDb)
-    {
-        return password_verify($password, $hashFromDb) ? true : false;
+        return $this->error ? '<div class="error">' . $this->error . '</div>' : '';
     }
 
     // get log in details based on provided email; return false if no email matched
     private function getDetailsToLogIn()
     {
         $query = "SELECT name, password, email, id, role FROM users WHERE email = ?";
-        $result = $this->db->selectQuery($query, [$this->email]);
-        return $result ? $result : false;
+        return $this->db->selectQuery($query, [$this->email]);
     }
 }
