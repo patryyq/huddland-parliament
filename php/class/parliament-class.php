@@ -202,9 +202,9 @@ class parliament
         $valid = new stdClass();
 
         $valid->MPname = $validate->multipleWords($data->MPname) ? $data->MPname : false;
-        $valid->party = $validate->id($data->party, 'party') ? $data->party : false;
+        $valid->party = $validate->id($data->party, 'party', 'noSession') ? $data->party : false;
         $valid->interest = $validate->id($data->interest, 'interestSearch') ? $data->interest : false;
-        $valid->constituency = $validate->id($data->constituency, 'constituency') ? $data->constituency : false;
+        $valid->constituency = $validate->id($data->constituency, 'constituency', 'noSession') ? $data->constituency : false;
         $valid->usedParams = [
             'MPname' => $valid->MPname,
             'party' => $valid->party,

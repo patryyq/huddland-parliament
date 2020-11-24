@@ -60,21 +60,26 @@ class db
     {
         $validate = new validate();
         if ($data = $validate->validatePostData(0)) {
-            $query = "INSERT INTO members (firstname, lastname, date_of_birth, party_id, constituency_id) VALUES (?, ?, ?, ?, ?)";
-            $parameters = [$data['firstname'], $data['lastname'], $data['dateOfBirth'], $data['party'], $data['constituency']];
-            $mpID = $this->insertQuery($query, $parameters);
+            // check if constituency ID isn't manually changed to represented one
+            if (!$this->isConstRepresented($data['constituency'])) {
+                $query = "INSERT INTO members (firstname, lastname, date_of_birth, party_id, constituency_id) VALUES (?, ?, ?, ?, ?)";
+                $parameters = [$data['firstname'], $data['lastname'], $data['dateOfBirth'], $data['party'], $data['constituency']];
+                $mpID = $this->insertQuery($query, $parameters);
 
-            $query = "INSERT INTO interest_member (member_id, interest_id) VALUES (?, ?)";
-            foreach ($data['interests'] as $interest) {
-                // insertQuery() returns lastInsertId() => $mpID === members.id
-                $parameters = [$mpID, $interest];
-                $this->insertQuery($query, $parameters);
+                $query = "INSERT INTO interest_member (member_id, interest_id) VALUES (?, ?)";
+                foreach ($data['interests'] as $interest) {
+                    // insertQuery() returns lastInsertId() => $mpID === members.id
+                    $parameters = [$mpID, $interest];
+                    $this->insertQuery($query, $parameters);
+                }
+
+                $_SESSION['addMPdetails'] = $data;
+                $parliament = new parliament();
+                $validate->message(0);
+                $parliament->unsetInputFieldSessions();
+            } else {
+                $validate->error(17);
             }
-
-            $_SESSION['addMPdetails'] = $data;
-            $parliament = new parliament();
-            $validate->message(0);
-            $parliament->unsetInputFieldSessions();
         }
         header('Location: manage.php?mp');
     }

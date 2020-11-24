@@ -133,7 +133,7 @@ class validate
     // is_numeric()
     // exists in given table name 
     // (prevent manipulated data)
-    public function id($value, $index)
+    public function id($value, $index, $noSession = false)
     {
         $db = new db();
         $inputName = $index;
@@ -141,12 +141,16 @@ class validate
         switch ($index) {
             case 'party':
                 $IDs = $db->getAllParties();
+                break;
             case 'mp':
                 $IDs = $db->getAllMp();
+                break;
             case 'constituency':
                 $IDs = $db->getAllConstituencies();
+                break;
             case 'interestSearch':
                 $IDs = $db->getAllInterests();
+                break;
         }
 
         $result = false;
@@ -157,7 +161,8 @@ class validate
         }
 
         if ($result) {
-            return $_SESSION[$inputName] = $result;
+            if ($noSession !== 'noSession') $_SESSION[$inputName] = $result;
+            return $result;
         } else {
             if ($inputName === 'party') {
                 return $this->error(5);
@@ -274,7 +279,7 @@ class validate
         }
     }
 
-    private function error($errorIndex)
+    public function error($errorIndex)
     {
         $errorMessages = [
             'Firstname must be longer than 2 characters.', // 0
@@ -293,7 +298,8 @@ class validate
             'Interest name must be longer than 2 characters.',
             'Electorate must be a number in range 30000-200000.',
             'Constituency region name must be longer than 2 characters.', // 15
-            'Party can not be older than 200 years.'
+            'Party can not be older than 200 years.',
+            'Select NOT represented constituency.'
         ];
         array_push($this->error, $errorMessages[$errorIndex]);
         $_SESSION['errorMessage'] = $this->error;
