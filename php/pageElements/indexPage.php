@@ -18,13 +18,14 @@
         </div>
         <div id="searchInputsWrapper" class="flex vis" style="margin-top: 0.8em;<?php echo $transition; ?>">
             <div class="inputWrapper"><label for="MPname">MP</label>
-                <input type="text" autocomplete="off" name="MPname" id="MPname"></div>
+                <input type="text" autocomplete="off" name="MPname" id="MPname">
+            </div>
             <div class="inputWrapper"><label for="party">party</label>
-                <?php echo $parliament->renderPartiesList(); ?> </div>
+                <?php echo $render->renderPartiesList(); ?> </div>
             <div class="inputWrapper"><label for="constituency">constituency</label>
-                <?php echo $parliament->renderConstituenciesList(); ?></div>
+                <?php echo $render->renderConstituenciesList(); ?></div>
             <div class="inputWrapper"><label for="interest">interest</label>
-                <?php echo $parliament->renderInterests('list'); ?></div>
+                <?php echo $render->renderInterests('list'); ?></div>
             <input type="submit" name="searchButton" id="searchButton" value="Search">
         </div>
     </div>
@@ -49,7 +50,7 @@
     <div id="browseText">Huddland Parliament MPs:</div>
     <div id="browseResults" class="browseResults">
         <?php
-        echo $parliament->renderMpList(); ?>
+        echo $render->renderMpList(); ?>
     </div>
 </main>
 <script src="js/search.js"></script>

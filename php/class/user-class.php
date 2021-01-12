@@ -42,7 +42,7 @@ class user
         header('Location: ' . LOGINPAGE);
     }
 
-    public function renderLogInError()
+    public function logInError()
     {
         return $this->error ? '<div class="error">' . $this->error . '</div>' : '';
     }

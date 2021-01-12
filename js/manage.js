@@ -67,9 +67,9 @@ const openTab = {
 
   // any submit button clicked, ask if sure
   confirmAction: function (event) {
-    if (event.target.getAttribute('type') == 'submit' && !confirm('Are you sure?')) {
-      event.preventDefault();
-    }
+    // if (event.target.getAttribute('type') == 'submit' && !confirm('Are you sure?')) {
+    //   event.preventDefault();
+    // }
   },
 
   wrapper: document.getElementById('manage'),

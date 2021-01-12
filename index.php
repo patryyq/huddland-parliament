@@ -1,6 +1,7 @@
 <?php
 include('php/config.php');
 $user = new user();
+$render = new render();
 
 $user->isLoggedIn() ? true : header('Location: ' . LOGINPAGE);
 

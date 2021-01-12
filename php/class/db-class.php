@@ -12,6 +12,7 @@ class db
 
     function __construct()
     {
+        $this->mpID = isset($_GET['mpID']) && is_numeric($_GET['mpID']) ? $_GET['mpID'] : false;
         try {
             $this->conn = new PDO("mysql:host=" . $this->dbHost . ";dbname=" . $this->dbName, $this->dbUser, $this->dbPass);
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -227,5 +228,25 @@ class db
             array_push($results, $singleResult);
         }
         return $results;
+    }
+
+    public function getSingleMpDetails()
+    {
+        // GROUP_CONCAT to gather all interests as a single string
+        $query =
+            "SELECT members.id, members.firstname, members.party_id, members.lastname, members.date_of_birth, 
+            parties.name, parties.date_of_foundation, parties.principal_colour, constituencies.region, 
+            constituencies.electorate, constituencies.id AS constiID,
+            GROUP_CONCAT(interests.name SEPARATOR ', ') AS interests,
+            GROUP_CONCAT(interests.id SEPARATOR ',') AS interestsID
+            FROM members
+            LEFT JOIN parties ON parties.id = members.party_id
+            LEFT JOIN constituencies ON constituencies.id = members.constituency_id 
+            LEFT JOIN interest_member ON interest_member.member_id = members.id
+            LEFT JOIN interests ON interests.id = interest_member.interest_id
+            WHERE members.id = ?";
+        $param = [$this->mpID];
+        $mp = $this->selectQuery($query, $param);
+        return ($mp[0]['firstname'] !== null) ? $mp : false;
     }
 }

@@ -15,7 +15,7 @@ header('Content-type: text/html; charset=utf-8');
     <div id="loginForm" class="flex">
         <h1>Huddland<br>Parliament</h1>
         <form method="POST" action="" class="flex">
-            <?php echo $user->renderLogInError(); ?>
+            <?php echo $user->logInError(); ?>
             <input type="email" name="email" placeholder="Email" value="<?php echo $user->email; ?>">
             <input type="password" name="password" id="password" placeholder="Password">
             <input type="submit" name="submit" value="Sign in">

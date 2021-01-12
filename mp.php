@@ -3,6 +3,7 @@ include('php/config.php');
 $user = new user();
 $parliament = new parliament();
 $validate = new validate();
+$db = new db();
 
 $user->isLoggedIn() ? true : header('Location: ' . LOGINPAGE);
 

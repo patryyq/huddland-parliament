@@ -13,14 +13,15 @@
             </div>
             <div class="inputWrapper">
                 <label for="dateOfBirth">date of birth</label>
-                <input type="date" name="dateOfBirth" value="<?php echo $_SESSION['dateOfBirth'] ?? false; ?>"></div>
+                <input type="date" name="dateOfBirth" value="<?php echo $_SESSION['dateOfBirth'] ?? false; ?>">
+            </div>
             <div class="inputWrapper"><label for="party">party</label>
-                <?php echo $parliament->renderPartiesList('valueFromSession'); ?> </div>
+                <?php echo $render->renderPartiesList('valueFromSession'); ?> </div>
             <div class="inputWrapper"><label for="constituency">constituency</label>
-                <?php echo $parliament->renderConstituenciesList('manage'); ?></div>
+                <?php echo $render->renderConstituenciesList('manage'); ?></div>
             <p>Interests:</p>
             <div style="width:100%" id="interestsBoxes" class="flex">
-                <?php echo $parliament->renderInterests('checkbox'); ?>
+                <?php echo $render->renderInterests('checkbox'); ?>
             </div>
             <p style="margin-top: 3em;">Do you want to add a new <b>MP</b>?</p>
             <div class="inputWrapper"> <input type="submit" name="addMpButton" value="Add MP"></div>

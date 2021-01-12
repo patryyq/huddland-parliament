@@ -55,7 +55,7 @@ class validate
     public function electorate($number)
     {
         $striped = intval(preg_replace('/[.,]/', '', $number));
-        return ($striped > 30000 && $striped < 200000) ? $_SESSION['electorate'] = $striped : $this->error(14);
+        return ($striped >= 30000 && $striped <= 200000) ? $_SESSION['electorate'] = $striped : $this->error(14);
     }
 
     // validate multiple words: region, interest, party

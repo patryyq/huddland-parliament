@@ -1,6 +1,6 @@
 <?php
 // variables to hold all MP details
-$mpDetails = $parliament->getSingleMpDetails()[0];
+$mpDetails = $db->getSingleMpDetails()[0];
 if ($mpDetails['firstname'] == false) header('Location: ' . APPLOCATION);
 
 $firstName = $validate->entitiesHTML($mpDetails['firstname']);

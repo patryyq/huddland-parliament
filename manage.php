@@ -6,6 +6,7 @@ $user->admin ? true : header('Location: ' . LOGINPAGE);
 
 $parliament = new parliament();
 $db = new db();
+$render = new render();
 $addConstituency = $_POST['addConstituencyButton'] ?? false;
 $addMp = $_POST['addMpButton'] ?? false;
 $addInterest = $_POST['addInterestButton'] ?? false;

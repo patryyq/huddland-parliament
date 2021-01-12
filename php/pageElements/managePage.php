@@ -8,30 +8,31 @@ $constituencyGET = isset($_GET['constituency']) ? true : false;
 ?>
 <main>
     <div id="manage" class="wrapper">
-        <?php $parliament->displayMessage(); ?>
+        <?php $render->displayMessage(); ?>
         <h1>Add content to the page</h1>
         <p style="margin-bottom:2em;">
-            <b><?php echo $user->name; ?></b>, as a admin, you can <b>add</b> content to the Huddland Parliament website.</p>
+            <b><?php echo $user->name; ?></b>, as a admin, you can <b>add</b> content to the Huddland Parliament website.
+        </p>
         <?php
-        $mpGET ? $parliament->displayError() : false;
+        $mpGET ? $render->displayError() : false;
         ?>
         <div id="MPmanage" class="manage">
             <?php include('managePage-mp.php'); ?>
         </div>
         <?php
-        $partyGET ? $parliament->displayError() : false;
+        $partyGET ? $render->displayError() : false;
         ?>
         <div id="PARTYmanage" class="manage">
             <?php include('managePage-party.php'); ?>
         </div>
         <?php
-        $interestsGET ? $parliament->displayError() : false;
+        $interestsGET ? $render->displayError() : false;
         ?>
         <div id="INTERESTSmanage" class="manage">
             <?php include('managePage-interests.php'); ?>
         </div>
         <?php
-        $constituencyGET ? $parliament->displayError() : false;
+        $constituencyGET ? $render->displayError() : false;
         ?>
         <div id="CONSTITUENCYmanage" class="manage">
             <?php include('managePage-constituency.php'); ?>
