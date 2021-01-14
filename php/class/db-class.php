@@ -5,7 +5,7 @@ class db
 {
     // Host: '127.0.0.1', instead of 'localhost', so I can be connectecd to VPN.
     // Being VPN connected and using 'localhost' won't load the page. It might be a XAMPP thing, not sure about that.
-    private $dbHost = '127.0.0.1';
+    private $dbHost = 'localhost';
     private $dbUser = 'root';
     private $dbPass = '';
     private $dbName = 'huddland-parliament';

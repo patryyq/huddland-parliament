@@ -15,7 +15,7 @@ class validate
         ['constituencyRegion', 'electorate'],
     ];
 
-    // array with: $_POST[index] => respective validation function
+    // $_POST[index] => respective validation function
     private $eachPOSTindexValidationMethod =
     [
         'firstname' => 'singleWord',

@@ -372,8 +372,7 @@ label {
   width: 33%;
   font-size: 1.2em;
 }
-/* source:
-https://stackoverflow.com/questions/62162645/change-color-of-chromes-calendar-icon-in-html-date-input */
+
 input::-webkit-calendar-picker-indicator {
   filter: opacity(0%);
 }

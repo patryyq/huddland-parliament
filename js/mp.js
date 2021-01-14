@@ -17,8 +17,7 @@
 // More info: https://medium.com/swlh/avoiding-cors-errors-on-localhost-in-2020-5a656ed8cefa
 //
 //
-// Gender API has limit of 500 requests a month, therefore is commented out during developemnt.
-// To use Gender API, replace line 64.
+// Gender API has limit of 500 requests a month; line 63 allows to turn ON/OFF the gender API
 
 const PROXY = 'https://cors-anywhere.herokuapp.com/';
 
@@ -61,12 +60,11 @@ async function getGender() {
 
 async function getRandomFace() {
   let randomFace;
-  let gender = { gender: 'unknown' }; // let gender = await getGender(); // >>REPLACE THIS LINE TO GET GENDER FROM API<<
+  let gender = await getGender(); // GENDER OFF: let gender = { gender: 'unknown' }; // GENDER ON:let gender = await getGender();
   gender = gender.gender === 'unknown' ? '' : gender.gender;
   const age = parseInt(document.getElementById('age').innerText);
 
   // minAge > 76 ? set to 76, because the API returns '404 Not Found' on ages > 76
-  // (quite weird, it could just ignore the age if thats an issue rather than spit errors...)
   const minAge = (age > 20 ? age - 2 : age) > 76 ? 76 : age - 2;
   const maxAge = age + 2; // maxAge is not affected by the minAge problem/bug(?)
 

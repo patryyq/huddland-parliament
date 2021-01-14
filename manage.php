@@ -13,7 +13,6 @@ $addInterest = $_POST['addInterestButton'] ?? false;
 $addParty = $_POST['addPartyButton'] ?? false;
 
 // if one of the ADD buttons is clicked, perform desired action;
-// die() to stop executing rest of this page - each of the functions takes care of everything;
 if ($addMp) {
     $db->addMP();
     die();

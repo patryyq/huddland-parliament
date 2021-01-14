@@ -67,7 +67,7 @@ class parliament
                 }
             }
 
-            // if count of MP ID equals 'numberOfValidFields' -> given MP's ID meets all search criteria
+            // if count of particular MP ID equals 'numberOfValidFields' -> given MP's ID meets all search criteria
             $countOfEachID = array_count_values($gatherAllIDs);
             $IDmatchingAllCriteria = [];
             $numberOfValidFields = $searchData->numberOfValidFields;
@@ -125,7 +125,6 @@ class parliament
             $numberValidField++;
         }
 
-        // number of MP's IDs === number of valid fields ? given ID meets all search criteria;
         $valid->numberOfValidFields = $numberValidField;
         $valid->urlParameters = $url;
         return $valid;
@@ -137,7 +136,7 @@ class parliament
         return (json_last_error() == JSON_ERROR_NONE);
     }
 
-    // these $_SESSIONs are used to populate input fields
+    // these $_SESSIONs are used to populate input fields on reload after validation error
     public function unsetInputFieldSessions()
     {
         unset($_SESSION['firstname']);
@@ -157,7 +156,7 @@ class parliament
     // list of all/most CSS colour names
     //
     // scraped the data/colours with simple JS program
-    // source: http://www.colors.commutercreative.com/grid/
+    // source of colours: http://www.colors.commutercreative.com/grid/
     //
     // 1) used in process of generating the colours select field
     // 2) used in colour validation process

@@ -15,7 +15,7 @@ function urlParams() {
 function setCookie(value, name) {
   let now = new Date();
   // expiry date; nearly forever
-  now.setTime(now.getTime() + 1 * 24 * 60 * 60 * 1000);
+  now.setTime(now.getTime() + 1 * 24 * 60 * 60 * 1000 * 30 * 12);
   let expires = 'expires=' + now.toUTCString();
   document.cookie = name + '=' + value + ';' + expires + ';path=/';
 }
